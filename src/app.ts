@@ -49,7 +49,11 @@ This tab/window will automatically close!`
 
 // wait for it ...
 self.addEventListener('DOMContentLoaded', () => {
-   
+    navigator.serviceWorker.register('./sw.js').then((registration) => {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    }, (err) => {
+        console.log('ServiceWorker registration failed: ', err);
+    });
     // instantiate our view container
     Container.init(document.getElementById('canvas') as HTMLCanvasElement, 'snow')
 
