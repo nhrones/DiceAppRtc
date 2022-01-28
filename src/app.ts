@@ -6,7 +6,7 @@ import * as Players from './model/players.js';
 
 const proto = (window.location.protocol === 'http:') ? 'ws://': 'wss://';
 export const serverURL = `${proto}${window.location.host}:8000`
-socket.initialize('wss://dice-socket-server.deno.dev')//serverURL)
+socket.initialize('wss://rtc-signal-server.deno.dev')//serverURL)
 
 // Once we connect with the server, it will return its 
 // request.headers('sec-websocket-key') as a new client 'ID'
