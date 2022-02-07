@@ -1,12 +1,9 @@
 
-import * as events from '../framework/model/events.js'
+import { ON, Event, Fire } from '../framework/model/events.js'
 import { Geometry, View, LabelState } from '../types.js'
 import { container, ctx } from './container.js'
 
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
+
 
 /** A virtual Label view class */
 export default class Label implements View {
@@ -47,7 +44,7 @@ export default class Label implements View {
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         if (bind) {
-            events.when(_.UpdateLabel + this.name,
+            ON(Event.UpdateLabel + this.name,
                 (data: {
                     state: number
                     color: string,
@@ -88,7 +85,7 @@ export default class Label implements View {
         ctx.strokeText(this.text, this.geometry.left, this.geometry.top)
     }
 
-    touched(_broadcast: boolean, _x: number, _y: number) {
+    touched() {
         // not implemented  
     }
 }

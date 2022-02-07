@@ -1,5 +1,5 @@
 
-import * as socket from './socket.js'
+import { onSocketRecieved, message, socketSend } from './socket.js'
 import { DEBUG } from '../../types.js'
 import { dispatch } from './socket.js'
 
@@ -12,7 +12,7 @@ export const initialize = () => {
 
     // handle a Session-Description-Offer 
     // @param {RTCSessionDescriptionInit} offer - {topic: string, sdp: string}
-    socket.when('RtcOffer', async (offer: RTCSessionDescriptionInit) => {
+    onSocketRecieved('RtcOffer', async (offer: RTCSessionDescriptionInit) => {
         if (peerConnection) {
             if (DEBUG) console.error('existing peerconnection');
             return;
@@ -20,7 +20,7 @@ export const initialize = () => {
         createPeerConnection(false);
         await peerConnection.setRemoteDescription(offer);
         const answer = await peerConnection.createAnswer();
-        socket.broadcast({ topic: 'RtcAnswer', data: { type: 'answer', sdp: answer.sdp } });
+        socketSend('RtcAnswer', { type: 'answer', sdp: answer.sdp });
 
         // Note that RTCPeerConnection won't start gathering 
         // candidates until setLocalDescription() is called.
@@ -29,7 +29,7 @@ export const initialize = () => {
 
     // handle a Session-Description-Answer 
     // @param {RTCSessionDescriptionInit} answer - {type: string, sdp: string}
-    socket.when('RtcAnswer', async (answer: RTCSessionDescriptionInit) => {
+    onSocketRecieved('RtcAnswer', async (answer: RTCSessionDescriptionInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
             return;
@@ -39,7 +39,7 @@ export const initialize = () => {
 
     // handle ICE-Candidate
     // @param {RTCIceCandidateInit} candidate - RTCIceCandidateInit
-    socket.when('candidate', async (candidate: RTCIceCandidateInit) => {
+    onSocketRecieved('candidate', async (candidate: RTCIceCandidateInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
             return;
@@ -51,7 +51,7 @@ export const initialize = () => {
         }
     })
 
-    socket.when('bye', () => {
+    onSocketRecieved('bye', () => {
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null
@@ -59,7 +59,7 @@ export const initialize = () => {
     })
 
     // A peer is offering to connect
-    socket.when('connectOffer', (_data: any) => {
+    onSocketRecieved('connectOffer', (_data: any) => {
         // I'll initiate an RTC-connection 
         // unless I'm engaged already.
         if (peerConnection) {
@@ -73,7 +73,7 @@ export const initialize = () => {
 }
 /** Start the peerConnection process by signalling an invitation */
 export const start = () => {
-    socket.broadcast({ topic: 'connectOffer', data: {} });
+    socketSend('connectOffer', {} );
 }
 
 /** Resets the peerConnection and dataChannel, then calls 'start()' */
@@ -113,7 +113,7 @@ function createPeerConnection(isOfferer: boolean) {
             init.sdpMLineIndex = event.candidate.sdpMLineIndex;
         }
         // sent over the signaller to the remote peer.
-        socket.broadcast({ topic: 'candidate', data: init });
+        socketSend('candidate', init);
     };
 
     // creating data channel 
@@ -160,7 +160,7 @@ Waiting for new offer on: ${location.origin}`, clearContent: true
 export async function makeConnection() {
     createPeerConnection(true);
     const offer = await peerConnection.createOffer();
-    socket.broadcast({ topic: 'RtcOffer', data: { type: 'offer', sdp: offer.sdp } });
+    socketSend('RtcOffer', { type: 'offer', sdp: offer.sdp });
     // Note that RTCPeerConnection won't start gathering 
     // candidates until setLocalDescription() is called.
     await peerConnection.setLocalDescription(offer);

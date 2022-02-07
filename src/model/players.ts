@@ -1,13 +1,8 @@
 
 import { Player } from '../types.js'
-import * as events from '../framework/model/events.js'
-import * as WS from '../framework/model/socket.js'
+import { ON, Event, Fire } from '../framework/model/events.js'
+import { onSocketRecieved, message, socketSend } from '../framework/model/socket.js'
 import { DiceGame } from './diceGame.js'
-
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
 
 const MAXPLAYERS = 2
 
@@ -31,16 +26,16 @@ export const init = (thisgame: DiceGame, color: string) => {
     }
     //this.players.add(thisPlayer)
 
-    WS.when(WS.topic.RegisterPlayer, (data: { id: string, name: string }) => {
+    onSocketRecieved(message.RegisterPlayer, (data: { id: string, name: string }) => {
         console.log(`WS.RegisterPlayer ${data.id}  ${data.name}`)
         addPlayer(data.id, data.name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
-        WS.broadcast({topic: WS.topic.UpdatePlayers, data: Array.from(players.values())});
+        socketSend(message.UpdatePlayers, Array.from(players.values()))
     })
 
     // will only come from focused-player (currentPlayer)
-    WS.when(WS.topic.UpdatePlayers, (playersArray: Player[]) => {
+    onSocketRecieved(message.UpdatePlayers, (playersArray: Player[]) => {
         //console.info(`playersArray: ${playersArray}`)
         // clear the players set
         players.clear()
@@ -69,7 +64,7 @@ export const init = (thisgame: DiceGame, color: string) => {
         game.resetGame()
     })
 
-    WS.when(WS.topic.RemovePlayer, (data: { id: string, name: string }) => {
+    onSocketRecieved(message.RemovePlayer, (data: { id: string, name: string }) => {
         removePlayer(data.id)
         game.resetGame()
     })
@@ -99,7 +94,7 @@ export const addScore = (player: Player, value: number) => {
 
 /** broadcast an update message to the view element */
 const updatePlayer = (index: number, color: string, text: string) => {
-    fireEvent(`${_.UpdateLabel}player${index}`,
+    Fire(`${Event.UpdateLabel}player${index}`,
         {
             color: thisColor,
             textColor: color, text: text

@@ -1,16 +1,15 @@
 
 import { Player } from '../types.js'
-import * as events from '../framework/model/events.js'
+import { ON, Event, Fire } from '../framework/model/events.js'
 import { currentPlayer, thisPlayer } from './players.js'
 import * as PlaySound from '../framework/model/sounds.js'
 import * as dice from './dice.js'
 import * as Possible from './possible.js'
-import  * as socket  from '../framework/model/socket.js'
-
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
+import  {
+    onSocketRecieved,
+    message,
+    socketSend
+}  from '../framework/model/socket.js'
 
 const SmallStraight = 8
 const LargeStraight = 9
@@ -58,23 +57,23 @@ export default class ScoreElement {
         //               bind events                 //
         /////////////////////////////////////////////// 
         // when I select a score
-        events.when(`${_.ScoreButtonTouched}${this.index}`, () => {
+        ON(`${Event.ScoreButtonTouched}${this.index}`, () => {
             // notify all other players
-            socket.broadcast({topic: `${socket.topic.UpdateScore}${this.index}`,
-                data: { id: thisPlayer.id, scoreNumber: this.index }}
+            socketSend(`${message.UpdateScore}${this.index}`,
+                {}
             )
             if (this.clicked()) {
-                socket.broadcast( {topic: socket.topic.ResetTurn, data:{}})
-                fireEvent(_.ScoreElementResetTurn, {})
+                socketSend(message.ResetTurn, {})
+                Fire(Event.ScoreElementResetTurn, {})
             }
         })
 
         // when other players select a score
-        socket.when(`${socket.topic.UpdateScore}${this.index}`, (_data: {}) => {
+        onSocketRecieved(`${message.UpdateScore}${this.index}`, () => {
             this.clicked()
         })
 
-        events.when(_.UpdateTooltip + this.index, (data: { hovered: boolean }) => {
+        ON(Event.UpdateTooltip + this.index, (data: { hovered: boolean }) => {
 
             let msg = ''
             let thisState = 0
@@ -99,7 +98,7 @@ export default class ScoreElement {
                 msg = ''
             }
 
-            fireEvent(_.UpdateLabel + infolabel,
+           Fire(Event.UpdateLabel + infolabel,
                 {
                     state: thisState,
                     color: snow,
@@ -111,7 +110,7 @@ export default class ScoreElement {
 
     /** broadcasts a message used to update the bottom infolabel element */
     updateInfo(text: string) {
-        fireEvent(_.UpdateLabel + infolabel,
+        Fire(Event.UpdateLabel + infolabel,
             { state: 0, color: snow, textColor: black, text: text }
         )
     }
@@ -131,7 +130,7 @@ export default class ScoreElement {
 
     /** fires event used to update the score value */
     renderValue(value: string) {
-        fireEvent(_.UpdateScoreElement + this.index,
+        Fire(Event.UpdateScoreElement + this.index,
             {
                 renderAll: false,
                 color: '',
@@ -143,7 +142,7 @@ export default class ScoreElement {
 
     /**  broadcasts a message used to update the score view element */
     updateScoreElement(color: string | null, value: string) {
-        fireEvent(_.UpdateScoreElement + this.index,
+        Fire(Event.UpdateScoreElement + this.index,
             {
                 renderAll: true,
                 color: color,

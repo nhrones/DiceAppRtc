@@ -1,13 +1,8 @@
 
-import * as events from '../framework/model/events.js'
+import { ON, Event, Fire }  from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import Label from './label.js'
-
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
 
 /** A virtual Button view class */
 export default class Button implements View {
@@ -53,7 +48,7 @@ export default class Button implements View {
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         // the viewModel will emit this event whenever it needs to update this view
-        events.when(_.UpdateButton + this.name,
+        ON(Event.UpdateButton + this.name,
                 (data: { text: string , color: string, enabled: boolean }) => {
                 this.enabled = data.enabled
                 this.color = data.color //_background
@@ -62,16 +57,10 @@ export default class Button implements View {
             })
     }
 
-    /** called by the view container when this element has been touched
-     * @param broadcast {boolean} if true, broadcast an event to any interested objects
-     * @param x {number} the horizontal location that was touched
-     * @param y {number} the vertical location that was touched
-     */
-    touched(broadcast: boolean, _x: number, _y: number) {
+    /** called by the view container when this element has been touched */
+    touched() {
         if (this.enabled) {
-            if (broadcast) {
-                fireEvent(_.ButtonTouched + this.name, {})
-            }
+            Fire(Event.ButtonTouched + this.name, {})
         }
     }
 

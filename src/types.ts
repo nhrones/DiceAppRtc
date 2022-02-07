@@ -37,7 +37,8 @@ export interface View {
 
     update(): void
     render(state?: any): void
-    touched(broadcast: boolean, x: number, y: number): void
+    /** called by the view container when this element has been touched */
+    touched(): void
 }
 
 /** a type used to contain the values    

@@ -1,16 +1,11 @@
 
-import * as events from '../framework/model/events.js'
+import { ON, Event, Fire } from '../framework/model/events.js'
 import { thisPlayer } from '../model/players.js'
 import * as PlaySound from '../framework/model/sounds.js'
 import * as evaluator from './diceEvaluator.js'
 import { game } from './diceGame.js'
-import * as socket from '../framework/model/socket.js'
+import { onSocketRecieved, message, socketSend } from '../framework/model/socket.js'
 import {Die} from '../types.js'
-
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
 
 /** Singleton Dice class.    
  * Represents a set of Die.    
@@ -59,7 +54,7 @@ export const init = () => {
     ///////////////////////////////////////////////
 
     // register a callback function for the `internal` DieTouched event
-    events.when(_.DieTouched, (data: { index: number }) => {
+    ON(Event.DieTouched, (data: { index: number }) => {
         const { index } = data
         const thisDie = die[index] as any
         if (thisDie.value > 0) {
@@ -67,13 +62,14 @@ export const init = () => {
             updateView(index, thisDie.value, thisDie.frozen)
             PlaySound.Select()
             // inform all other players
-            socket.broadcast({topic: socket.topic.UpdateDie, data:{ dieNumber: index, AppID: thisPlayer.id }})
+            //hack socket.broadcast({topic: socket.topic.UpdateDie, data:{ dieNumber: index, AppID: thisPlayer.id }})
+            socketSend(message.UpdateDie, { dieNumber: index})
         }
     })
 
     // register a callback function for the webSocket.UpdateDie event
     // when other player touched their die ...
-    socket.when(socket.topic.UpdateDie, (data: { dieNumber: number }) => {
+    onSocketRecieved(message.UpdateDie, (data: { dieNumber: number }) => {
         const d = die[data.dieNumber]
         if (d.value > 0) {
             d.frozen = !d.frozen
@@ -138,7 +134,7 @@ export const roll = (dieValues: number[] | null) => {
  * @param frozen {boolean} the frozen state of this die
  */
 const updateView = (index: number, value: number, frozen: boolean) => {
-    fireEvent(_.UpdateDie + index, { value: value, frozen: frozen })
+    Fire(Event.UpdateDie + index, { value: value, frozen: frozen })
 }
 
 /** returns the set of die values as a formatted string */

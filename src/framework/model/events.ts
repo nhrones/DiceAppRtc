@@ -10,10 +10,10 @@ const topicSubscriptions: Map<string, callbackFunc[]> = new Map()
  *	@param callback {function} a callback function
  *	@returns remove {object} returns an object containing a 'remove' function
  */
-export const when = (topic: string, callback: callbackFunc): { remove: any } => {
+export const ON = (topic: string, callback: callbackFunc): { remove: any } => {
     return _registerListener(topic, callback)
 }
-
+//export const ON = when
 /** _registerListener
  *	private internal function ...
  *  registers a callback function to be executed when a topic is published
@@ -45,12 +45,12 @@ const _registerListener = (topic: string, callback: callbackFunc) => {
     }
 }
 
-/** broadcasts a topic with optional data
- *	e.g.: Events.broadcast("GameOver", winner)
+/** fires an event for a topic with optional data
+ *	e.g.: Events.fireEvent("GameOver", winner)
  *	@param {string} topic - the topic of interest
  *	@param {object} data - optional data to report to subscribers
  */
-export const broadcast = (topic: string, data: {}) => {   //string | object) {
+export const Fire = (topic: string, data: {}) => {   //string | object) {
     if (topicSubscriptions.has(topic)) {
         _dispatch(topicSubscriptions.get(topic)!, data)
     }
@@ -65,20 +65,8 @@ const _dispatch = (subscriptions: Function[], data: string | object) => {
     }
 }
 
-/** removes all registered topics and all of their listeners */
-const reset = () => {
-    topicSubscriptions.clear()
-}
-
-/** removes a topic and all of its listeners
- * @param {string} topic
- */
-const removeTopic = (topic: string) => {
-    topicSubscriptions.delete(topic)
-}
-
-/** exported event topics list */
-export const topic = {
+/** exported Event names list */
+export const Event = {
     ButtonTouched: 'ButtonTouched',
     CancelEdits: 'CancelEdits',
     DieTouched: 'DieTouched',

@@ -1,12 +1,7 @@
 
 import * as main from './webRTC.js'
 import { DEBUG, callbackFunc, SignallingMessage } from '../../types.js'
-import * as events from '../model/events.js'
- 
-const {
-    topic: _,
-    broadcast: fireEvent,
-} = events
+import { ON, Event, Fire } from '../model/events.js'
 
 /** Each Map-entry holds an array of callback functions mapped to a topic name */
 const subscriptions = new Map<string, callbackFunc[]>()
@@ -46,7 +41,7 @@ export const initialize = (serverURL: string) => {
 
     socket.addEventListener('error', (err) => {
         if (DEBUG) console.error('Socket.error!', err);
-        fireEvent(_.ShowPopup, { message: `Game Full! Please close tab!` })
+        Fire(Event.ShowPopup, { message: `Game Full! Please close tab!` })
     })
 
     if (DEBUG) console.log(`connected to: ${serverURL}`)
@@ -65,15 +60,10 @@ export const registerPlayer = (id: string, name: string) => {
     // At this point, we don't know our peer.
     // Since we're registering, we wait for a 'PlayerUpdate' response
     // from the  player that currently has 'focus'
-    broadcast(
-        {
-            topic: topic.RegisterPlayer,
-            data: { id: id, name: name }
-        }
-    )
+    socketSend(message.RegisterPlayer,{ id: id, name: name })
 }
 
-/** Dispatches an event topic message to all registered listeners with optional data    
+/** Dispatches a message event to all registered listeners with optional data    
  *	
  *@example WSC.dispatch( "GameOver", winner )    
  *@param topic {string} the topic of interest
@@ -91,12 +81,12 @@ export const dispatch = (topic: string, data: string | object) => {
 }
 
 /**
- *  registers a callback function to be executed 'when' a topic is published
+ *  registers a callback function to be executed when a topic is published
  *	@example Socket.when("GameOver", Game.resetGame)
  *	@param topic {string} the topic of interest
  *	@param listener {function} a callback function
  */
-export const when = (topic: string, listener: callbackFunc) => {
+export const onSocketRecieved = (topic: string, listener: callbackFunc) => {
     if (!subscriptions.has(topic)) {
         subscriptions.set(topic, [])
     }
@@ -109,8 +99,8 @@ export const when = (topic: string, listener: callbackFunc) => {
  *	@param {string} topic - the topic of interest
  *	@param {object} data - the data object to send
  */
-export const broadcast = (message: SignallingMessage) => {
-    const msg = JSON.stringify(message)
+ export const socketSend = (topic: string, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {   
+    const msg = JSON.stringify( { topic: topic, data: data } )
     if (main.dataChannel && main.dataChannel.readyState === 'open') {
         console.log('broadcast on DataChannel:', msg)
         main.dataChannel.send(msg)
@@ -122,8 +112,8 @@ export const broadcast = (message: SignallingMessage) => {
     }
 }
 
-/** exported socket event topics list */
-export const topic = {
+/** exported socket event message list */
+export const message = {
 
     /* game events */
     RegisterPlayer: 'RegisterPlayer', // socket.js:69

@@ -1,16 +1,17 @@
 
-import * as events from '../framework/model/events.js'
+import {} from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import  * as socket  from '../framework/model/socket.js'
 
 /*  aliases  */
-const { topic: soc } = socket
+const { message: soc } = socket
 
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
+import {  
+    ON, 
+    Event,  
+    Fire 
+} from '../framework/model/events.js'
 
 let left = 1
 let top = 1
@@ -54,16 +55,16 @@ export default class Popup implements View {
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         // Our model broadcasts this ShowPopup event at the end of a game
-        events.when(_.ShowPopup, (data: { message: string }) => {
+        ON(Event.ShowPopup, (data: { message: string }) => {
             this.show(data.message)
         })
 
         // Other web-players may broadcast a ShowPopup event at the end of a game
-        socket.when(soc.ShowPopup, (data: { message: string }) => {
+        socket.onSocketRecieved(soc.ShowPopup, (data: { message: string }) => {
             this.show(data.message)
         })
 
-        events.when(_.HidePopup, () => {
+        ON(Event.HidePopup, () => {
             this.hide()
         })
     }
@@ -104,18 +105,12 @@ export default class Popup implements View {
         }
     }
 
-    /**
-     * called by the view container when this element has been touched
-     * @param broadcast {boolean} if true, broadcast an event to any interested objects
-     * @param x {number} the horizontal location that was touched
-     * @param y {number} the vertical location that was touched
-     */
-    touched(_broadcast: boolean, _x: number, _y: number) {
+    /** called by the view container when this element has been touched */
+    touched() {
         this.hide()
-        fireEvent(_.PopupResetGame, {})
+        Fire(Event.PopupResetGame, {})
     }
 
-    /** update this virtual Popups view (render it) */
     update() {
         if (this.visible) this.render()
     }

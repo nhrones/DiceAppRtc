@@ -10,7 +10,7 @@ socket.initialize('wss://rtc-signal-server.deno.dev')//serverURL)
 
 // Once we connect with the server, it will return its 
 // request.headers('sec-websocket-key') as a new client 'ID'
-socket.when(socket.topic.SetID, (data: { id: string }) => {
+socket.onSocketRecieved(socket.message.SetID, (data: { id: string }) => {
 //     const name = prompt(`
 // Please enter your name or just
 // press enter to accept 'Player'`, "Player") || 'Player';
@@ -36,7 +36,7 @@ const name = 'Player'
 }) 
 
 // issue a new client 'ID'
-socket.when(socket.topic.GameFull, () => {
+socket.onSocketRecieved(socket.message.GameFull, () => {
     const msg = `Sorry, This game is already full!
 This tab/window will automatically close!`
     console.log(msg)

@@ -6,8 +6,8 @@ import * as viewElements from './viewElements.js'
 import { View } from '../../types.js';
 
 const {  
-    topic: _ ,
-    broadcast: fireEvent,
+    Event: _ ,
+    Fire: fireEvent,
 } = events
 
 ///////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -136,7 +136,7 @@ function handleClickOrTouch(mX: number, mY: number) {
         for (const element of viewElements.activeNodes) {
             if (!hit) {
                 if (ctx.isPointInPath(element.path, x, y)) {
-                    element.touched(true, x, y)
+                    element.touched()
                     hit = true
                     if (!(element.name === 'player0textInput')) {
                         fireEvent(_.CancelEdits, {})

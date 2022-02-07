@@ -1,12 +1,7 @@
 
-import * as events from '../framework/model/events.js'
+import { ON, Event, Fire } from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { ctx } from './container.js'
-
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
 
 /** a class that creates instances of virtual Die    
  *  elements that are to be rendered to a canvas
@@ -45,16 +40,16 @@ export default class Die implements View {
         //                         bind events                       \\
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-        events.when(_.UpdateDie + this.index, (state: {frozen: boolean, value: number}) => {
+        ON(Event.UpdateDie + this.index, (state: {frozen: boolean, value: number}) => {
                 this.frozen = state.frozen
                 this.value = state.value
                 this.render(state)
             })
     }
 
-    touched(_broadcast: boolean, _x: number, _y: number) {
+    touched() {
         // inform Dice with index data
-        fireEvent(_.DieTouched,{ index: this.index.toString() })
+        Fire(Event.DieTouched,{ index: this.index.toString() })
     }
 
     update() {

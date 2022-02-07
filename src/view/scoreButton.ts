@@ -1,13 +1,13 @@
 
-import * as events from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import Label from './label.js'
 
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
+import {  
+    ON, 
+    Event,  
+    Fire 
+} from '../framework/model/events.js'
 
 /** A virtual ScoreButton view class */
 export default class ScoreButton implements View {
@@ -61,7 +61,7 @@ export default class ScoreButton implements View {
         //                         bind events                       \\
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-        events.when(_.UpdateScoreElement + this.index,
+        ON(Event.UpdateScoreElement + this.index,
             (data: {
                 renderAll: boolean,
                 color: string,
@@ -79,18 +79,13 @@ export default class ScoreButton implements View {
             })
     }
 
-    /** called by the view container when this element has been touched
-     * @param broadcast {boolean} if true, broadcast an event to any interested objects
-     * @param x {number} the horizontal location that was touched
-     * @param y {number} the vertical location that was touched
-     */
-    touched(_broadcast: boolean, _x: number, _y: number) {
-        fireEvent(_.ScoreButtonTouched + this.index, {})
+    /** called by the view container when this element has been touched */
+    touched() {
+        Fire(Event.ScoreButtonTouched + this.index, {})
     }
 
-    /** updates and renders the virtual ScoreButton view */
     update() {
-        fireEvent(_.UpdateTooltip + this.index, {hovered: this.hovered})
+        Fire(Event.UpdateTooltip + this.index, {hovered: this.hovered})
         this.render()
         this.renderScore(this.scoreText, this.available)
     }

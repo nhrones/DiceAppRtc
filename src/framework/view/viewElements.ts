@@ -15,13 +15,8 @@
 //////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 import { View } from '../../types.js'
-import * as events from '../model/events.js'
+import { ON, Event, Fire } from '../model/events.js'
 import { container } from '../../view/container.js'
-
-const {  
-    topic: _ ,
-    broadcast: fireEvent,
-} = events
 
 export const nodes: Set<View> = new Set()
 export const activeNodes: Set<View> = new Set()
@@ -39,7 +34,7 @@ export const add = (view: View) => {
     }
 
     // sends a message to diceGame to build an appropriate viewmodel
-    fireEvent(_.ViewWasAdded,
+    Fire(Event.ViewWasAdded,
         {
             type: view.constructor.name,
             index: view.index,
