@@ -1,7 +1,7 @@
 
-import { onSocketRecieved, message, socketSend } from './socket.js'
+import { onSignalRecieved, message, sendSignal } from './signalling.js'
 import { DEBUG } from '../../types.js'
-import { dispatch } from './socket.js'
+import { dispatch } from './signalling.js'
 
 export let peerConnection: RTCPeerConnection;
 
@@ -11,8 +11,8 @@ export let dataChannel: RTCDataChannel;
 export const initialize = () => {
 
     // handle a Session-Description-Offer 
-    // @param {RTCSessionDescriptionInit} offer - {topic: string, sdp: string}
-    onSocketRecieved('RtcOffer', async (offer: RTCSessionDescriptionInit) => {
+    // param {RTCSessionDescriptionInit} offer - {topic: string, sdp: string}
+    onSignalRecieved(message.RtcOffer, async (offer: RTCSessionDescriptionInit) => {
         if (peerConnection) {
             if (DEBUG) console.error('existing peerconnection');
             return;
@@ -20,7 +20,7 @@ export const initialize = () => {
         createPeerConnection(false);
         await peerConnection.setRemoteDescription(offer);
         const answer = await peerConnection.createAnswer();
-        socketSend('RtcAnswer', { type: 'answer', sdp: answer.sdp });
+        sendSignal(message.RtcAnswer, { type: 'answer', sdp: answer.sdp });
 
         // Note that RTCPeerConnection won't start gathering 
         // candidates until setLocalDescription() is called.
@@ -29,7 +29,7 @@ export const initialize = () => {
 
     // handle a Session-Description-Answer 
     // @param {RTCSessionDescriptionInit} answer - {type: string, sdp: string}
-    onSocketRecieved('RtcAnswer', async (answer: RTCSessionDescriptionInit) => {
+    onSignalRecieved(message.RtcAnswer, async (answer: RTCSessionDescriptionInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
             return;
@@ -39,7 +39,7 @@ export const initialize = () => {
 
     // handle ICE-Candidate
     // @param {RTCIceCandidateInit} candidate - RTCIceCandidateInit
-    onSocketRecieved('candidate', async (candidate: RTCIceCandidateInit) => {
+    onSignalRecieved(message.IceCandidate, async (candidate: RTCIceCandidateInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
             return;
@@ -51,7 +51,7 @@ export const initialize = () => {
         }
     })
 
-    onSocketRecieved('bye', () => {
+    onSignalRecieved(message.Bye, () => {
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null
@@ -59,7 +59,7 @@ export const initialize = () => {
     })
 
     // A peer is offering to connect
-    onSocketRecieved('connectOffer', (_data: any) => {
+    onSignalRecieved(message.ConnectOffer, (_data: any) => {
         // I'll initiate an RTC-connection 
         // unless I'm engaged already.
         if (peerConnection) {
@@ -73,7 +73,7 @@ export const initialize = () => {
 }
 /** Start the peerConnection process by signalling an invitation */
 export const start = () => {
-    socketSend('connectOffer', {} );
+    sendSignal(message.ConnectOffer, {} );
 }
 
 /** Resets the peerConnection and dataChannel, then calls 'start()' */
@@ -113,7 +113,7 @@ function createPeerConnection(isOfferer: boolean) {
             init.sdpMLineIndex = event.candidate.sdpMLineIndex;
         }
         // sent over the signaller to the remote peer.
-        socketSend('candidate', init);
+        sendSignal(message.IceCandidate, init);
     };
 
     // creating data channel 
@@ -160,12 +160,11 @@ Waiting for new offer on: ${location.origin}`, clearContent: true
 export async function makeConnection() {
     createPeerConnection(true);
     const offer = await peerConnection.createOffer();
-    socketSend('RtcOffer', { type: 'offer', sdp: offer.sdp });
+    sendSignal(message.RtcOffer, { type: 'offer', sdp: offer.sdp });
     // Note that RTCPeerConnection won't start gathering 
     // candidates until setLocalDescription() is called.
     await peerConnection.setLocalDescription(offer);
 }
-
 
 // Finaly ... tell them your listening/waiting
 updateUI({ content: `Player1 is waiting for a connection from: ${location.origin}` });

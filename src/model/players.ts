@@ -1,7 +1,7 @@
 
-import { Player } from '../types.js'
+import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
-import { onSocketRecieved, message, socketSend } from '../framework/model/socket.js'
+import { Player } from '../types.js'
 import { DiceGame } from './diceGame.js'
 
 const MAXPLAYERS = 2
@@ -26,16 +26,16 @@ export const init = (thisgame: DiceGame, color: string) => {
     }
     //this.players.add(thisPlayer)
 
-    onSocketRecieved(message.RegisterPlayer, (data: { id: string, name: string }) => {
+    onSignalRecieved(message.RegisterPlayer, (data: { id: string, name: string }) => {
         console.log(`WS.RegisterPlayer ${data.id}  ${data.name}`)
         addPlayer(data.id, data.name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
-        socketSend(message.UpdatePlayers, Array.from(players.values()))
+        sendSignal(message.UpdatePlayers, Array.from(players.values()))
     })
 
     // will only come from focused-player (currentPlayer)
-    onSocketRecieved(message.UpdatePlayers, (playersArray: Player[]) => {
+    onSignalRecieved(message.UpdatePlayers, (playersArray: Player[]) => {
         //console.info(`playersArray: ${playersArray}`)
         // clear the players set
         players.clear()
@@ -64,7 +64,7 @@ export const init = (thisgame: DiceGame, color: string) => {
         game.resetGame()
     })
 
-    onSocketRecieved(message.RemovePlayer, (data: { id: string, name: string }) => {
+    onSignalRecieved(message.RemovePlayer, (data: { id: string, name: string }) => {
         removePlayer(data.id)
         game.resetGame()
     })

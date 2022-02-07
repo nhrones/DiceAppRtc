@@ -1,11 +1,7 @@
 
+import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
 import * as dice from './dice.js'
-import {
-    onSocketRecieved,
-    message,
-    socketSend
-} from '../framework/model/socket.js'
 
 const kind = 'rollbutton'
 export const state = { text: '', color: '', enabled: true }
@@ -17,14 +13,14 @@ export const init = () => {
     // when this instance rolls dice
     ON(`${Event.ButtonTouched}${kind}`, () => {
         dice.roll(null)
-        socketSend(message.UpdateRoll,
+        sendSignal(message.UpdateRoll,
             {dice: dice.toString()}
         )
         updateRollState()
     })
 
     // when oponents rolled the dice
-    onSocketRecieved(message.UpdateRoll, (data: { dice: string }) => {
+    onSignalRecieved(message.UpdateRoll, (data: { dice: string }) => {
         dice.roll(JSON.parse(data.dice))
         updateRollState()
     })

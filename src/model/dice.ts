@@ -1,10 +1,8 @@
-
+import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
-import { thisPlayer } from '../model/players.js'
 import * as PlaySound from '../framework/model/sounds.js'
 import * as evaluator from './diceEvaluator.js'
 import { game } from './diceGame.js'
-import { onSocketRecieved, message, socketSend } from '../framework/model/socket.js'
 import {Die} from '../types.js'
 
 /** Singleton Dice class.    
@@ -63,13 +61,13 @@ export const init = () => {
             PlaySound.Select()
             // inform all other players
             //hack socket.broadcast({topic: socket.topic.UpdateDie, data:{ dieNumber: index, AppID: thisPlayer.id }})
-            socketSend(message.UpdateDie, { dieNumber: index})
+            sendSignal(message.UpdateDie, { dieNumber: index})
         }
     })
 
     // register a callback function for the webSocket.UpdateDie event
     // when other player touched their die ...
-    onSocketRecieved(message.UpdateDie, (data: { dieNumber: number }) => {
+    onSignalRecieved(message.UpdateDie, (data: { dieNumber: number }) => {
         const d = die[data.dieNumber]
         if (d.value > 0) {
             d.frozen = !d.frozen

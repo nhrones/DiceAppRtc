@@ -1,7 +1,7 @@
 
-import * as main from './webRTC.js'
-import { DEBUG, callbackFunc, SignallingMessage } from '../../types.js'
-import { ON, Event, Fire } from '../model/events.js'
+import { Event, Fire } from './events.js'
+import * as webRTC from './webRTC.js'
+import { DEBUG, callbackFunc } from '../../types.js'
 
 /** Each Map-entry holds an array of callback functions mapped to a topic name */
 const subscriptions = new Map<string, callbackFunc[]>()
@@ -29,8 +29,8 @@ export const initialize = (serverURL: string) => {
 
     socket.onopen = () => {
         if (DEBUG) console.log('signalling.socket.opened!');
-        main.initialize()
-        main.start()
+        webRTC.initialize()
+        webRTC.start()
     }
 
     // handle the socket close event
@@ -60,12 +60,12 @@ export const registerPlayer = (id: string, name: string) => {
     // At this point, we don't know our peer.
     // Since we're registering, we wait for a 'PlayerUpdate' response
     // from the  player that currently has 'focus'
-    socketSend(message.RegisterPlayer,{ id: id, name: name })
+    sendSignal(message.RegisterPlayer,{ id: id, name: name })
 }
 
 /** Dispatches a message event to all registered listeners with optional data    
  *	
- *@example WSC.dispatch( "GameOver", winner )    
+ *@example dispatch( "GameOver", winner )    
  *@param topic {string} the topic of interest
  *@param data {string | object} optional data to report to subscribers
  */
@@ -86,7 +86,7 @@ export const dispatch = (topic: string, data: string | object) => {
  *	@param topic {string} the topic of interest
  *	@param listener {function} a callback function
  */
-export const onSocketRecieved = (topic: string, listener: callbackFunc) => {
+export const onSignalRecieved = (topic: string, listener: callbackFunc) => {
     if (!subscriptions.has(topic)) {
         subscriptions.set(topic, [])
     }
@@ -99,11 +99,12 @@ export const onSocketRecieved = (topic: string, listener: callbackFunc) => {
  *	@param {string} topic - the topic of interest
  *	@param {object} data - the data object to send
  */
- export const socketSend = (topic: string, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {   
+ export const sendSignal = (topic: string, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {   
+    //TODO fix this to send two params instead of an object
     const msg = JSON.stringify( { topic: topic, data: data } )
-    if (main.dataChannel && main.dataChannel.readyState === 'open') {
+    if (webRTC.dataChannel && webRTC.dataChannel.readyState === 'open') {
         console.log('broadcast on DataChannel:', msg)
-        main.dataChannel.send(msg)
+        webRTC.dataChannel.send(msg)
     } else if (socket) {
         console.log('broadcast on WebSocket:', msg)
         socket.send(msg)
@@ -129,9 +130,9 @@ export const message = {
     GameFull: "GameFull", // app.js 29
 
     /* WebRTC events*/
-    bye: 'bye',
+    Bye: 'bye',
     RtcOffer: 'RtcOffer',
     RtcAnswer: 'RtcAnswer',
-    candidate: 'candidate',
-    connectOffer: 'connectOffer'
+    IceCandidate: 'candidate',
+    ConnectOffer: 'connectOffer'
 }

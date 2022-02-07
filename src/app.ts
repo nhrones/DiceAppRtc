@@ -1,7 +1,7 @@
 
 import { DiceGame, game } from './model/diceGame.js';
 import { Container, container } from './view/container.js'
-import  * as socket  from './framework/model/socket.js';
+import  * as socket  from './framework/model/signalling.js';
 import * as Players from './model/players.js';
 
 const proto = (window.location.protocol === 'http:') ? 'ws://': 'wss://';
@@ -10,7 +10,7 @@ socket.initialize('wss://rtc-signal-server.deno.dev')//serverURL)
 
 // Once we connect with the server, it will return its 
 // request.headers('sec-websocket-key') as a new client 'ID'
-socket.onSocketRecieved(socket.message.SetID, (data: { id: string }) => {
+socket.onSignalRecieved(socket.message.SetID, (data: { id: string }) => {
 //     const name = prompt(`
 // Please enter your name or just
 // press enter to accept 'Player'`, "Player") || 'Player';
@@ -36,7 +36,7 @@ const name = 'Player'
 }) 
 
 // issue a new client 'ID'
-socket.onSocketRecieved(socket.message.GameFull, () => {
+socket.onSignalRecieved(socket.message.GameFull, () => {
     const msg = `Sorry, This game is already full!
 This tab/window will automatically close!`
     console.log(msg)

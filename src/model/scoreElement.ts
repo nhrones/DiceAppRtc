@@ -1,15 +1,11 @@
 
-import { Player } from '../types.js'
+import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
+import { Player } from '../types.js'
 import { currentPlayer, thisPlayer } from './players.js'
 import * as PlaySound from '../framework/model/sounds.js'
 import * as dice from './dice.js'
 import * as Possible from './possible.js'
-import  {
-    onSocketRecieved,
-    message,
-    socketSend
-}  from '../framework/model/socket.js'
 
 const SmallStraight = 8
 const LargeStraight = 9
@@ -59,17 +55,17 @@ export default class ScoreElement {
         // when I select a score
         ON(`${Event.ScoreButtonTouched}${this.index}`, () => {
             // notify all other players
-            socketSend(`${message.UpdateScore}${this.index}`,
+            sendSignal(`${message.UpdateScore}${this.index}`,
                 {}
             )
             if (this.clicked()) {
-                socketSend(message.ResetTurn, {})
+                sendSignal(message.ResetTurn, {})
                 Fire(Event.ScoreElementResetTurn, {})
             }
         })
 
         // when other players select a score
-        onSocketRecieved(`${message.UpdateScore}${this.index}`, () => {
+        onSignalRecieved(`${message.UpdateScore}${this.index}`, () => {
             this.clicked()
         })
 
