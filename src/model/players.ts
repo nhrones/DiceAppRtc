@@ -24,8 +24,7 @@ export const init = (thisgame: DiceGame, color: string) => {
         score: 0,
         lastScore: ''
     }
-    //this.players.add(thisPlayer)
-
+ 
     onSignalRecieved(message.RegisterPlayer, (data: { id: string, name: string }) => {
         console.log(`WS.RegisterPlayer ${data.id}  ${data.name}`)
         addPlayer(data.id, data.name);

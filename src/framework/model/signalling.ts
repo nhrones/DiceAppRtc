@@ -1,4 +1,4 @@
-
+ 
 import { Event, Fire } from './events.js'
 import * as webRTC from './webRTC.js'
 import { DEBUG, callbackFunc } from '../../types.js'
@@ -11,7 +11,7 @@ export let socket: WebSocket | null = null
 
 /** Initializes this websocket service event listeners */
 export const initialize = (serverURL: string) => {
-
+    if (DEBUG) console.log('initializing socket at: ', serverURL)
     // if we've already initialized just return
     if (socket) { return }
 
@@ -48,8 +48,16 @@ export const initialize = (serverURL: string) => {
 
     // set up a `message` event handler for this connection
     socket.addEventListener('message', (message: MessageEvent) => {
-        const { topic, data } = JSON.parse(message.data)
-        dispatch(topic, data)
+        console.info('socket recieved message.data: ', message.data)
+        //const { topic, data } = JSON.parse(message.data)
+        const payload = JSON.parse(message.data)
+        if(Array.isArray(payload)) {    
+            console.info('socket recieved topic: ', payload[0])
+            dispatch(payload[0], payload[1])
+        }else{
+            dispatch(payload.topic, payload.data)
+        }
+        
     })
 }
 
@@ -101,7 +109,8 @@ export const onSignalRecieved = (topic: string, listener: callbackFunc) => {
  */
  export const sendSignal = (topic: string, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {   
     //TODO fix this to send two params instead of an object
-    const msg = JSON.stringify( { topic: topic, data: data } )
+    //const msg = JSON.stringify( { topic: topic, data: data } )
+    const msg = JSON.stringify( [ topic, data ] )
     if (webRTC.dataChannel && webRTC.dataChannel.readyState === 'open') {
         console.log('broadcast on DataChannel:', msg)
         webRTC.dataChannel.send(msg)
@@ -114,25 +123,70 @@ export const onSignalRecieved = (topic: string, listener: callbackFunc) => {
 }
 
 /** exported socket event message list */
-export const message = {
+// export const message = {
+//     /* game events */
+//     RegisterPlayer: 'RegisterPlayer', // socket.js:69
+//     RemovePlayer: 'RemovePlayer', // players.js:
+//     ResetGame: 'ResetGame', // diceGame.js:30
+//     ResetTurn: 'ResetTurn', // diceGame.js:24
+//     ShowPopup: 'ShowPopup', // popup.js:30
+//     UpdateRoll: 'UpdateRoll', // rollButton.js:13
+//     UpdateScore: 'UpdateScore', // scoreElement.js:31
+//     UpdateDie: 'UpdateDie', // dice.js:32
+//     UpdatePlayers: 'UpdatePlayers', // players.js:17
+//     SetID: "SetID", // app.js:5
+//     GameFull: "GameFull", // app.js 29
 
+//     /* WebRTC events*/
+//     Bye: 'bye',
+//     RtcOffer: 'RtcOffer',
+//     RtcAnswer: 'RtcAnswer',
+//     IceCandidate: 'candidate',
+//     ConnectOffer: 'connectOffer'
+// }
+
+
+/** exported socket event message list */
+export enum message {
     /* game events */
-    RegisterPlayer: 'RegisterPlayer', // socket.js:69
-    RemovePlayer: 'RemovePlayer', // players.js:
-    ResetGame: 'ResetGame', // diceGame.js:30
-    ResetTurn: 'ResetTurn', // diceGame.js:24
-    ShowPopup: 'ShowPopup', // popup.js:30
-    UpdateRoll: 'UpdateRoll', // rollButton.js:13
-    UpdateScore: 'UpdateScore', // scoreElement.js:31
-    UpdateDie: 'UpdateDie', // dice.js:32
-    UpdatePlayers: 'UpdatePlayers', // players.js:17
-    SetID: "SetID", // app.js:5
-    GameFull: "GameFull", // app.js 29
+    RegisterPlayer = 'RegisterPlayer', // socket.js:69
+    RemovePlayer = 'RemovePlayer', // players.js:
+    ResetGame = 'ResetGame', // diceGame.js:30
+    ResetTurn = 'ResetTurn', // diceGame.js:24
+    ShowPopup = 'ShowPopup', // popup.js:30
+    UpdateRoll = 'UpdateRoll', // rollButton.js:13
+    UpdateScore = 'UpdateScore', // scoreElement.js:31
+    UpdateDie = 'UpdateDie', // dice.js:32
+    UpdatePlayers = 'UpdatePlayers', // players.js:17
+    SetID = "SetID",  // app.js:5
+    GameFull = "GameFull", // app.js 29
 
     /* WebRTC events*/
-    Bye: 'bye',
-    RtcOffer: 'RtcOffer',
-    RtcAnswer: 'RtcAnswer',
-    IceCandidate: 'candidate',
-    ConnectOffer: 'connectOffer'
+    Bye = 'bye',
+    RtcOffer = 'RtcOffer',
+    RtcAnswer = 'RtcAnswer',
+    IceCandidate = 'candidate',
+    ConnectOffer = 'connectOffer'
 }
+
+/** exported socket event message list */
+// export enum message {
+//     /* game events */
+//     RegisterPlayer,
+//     RemovePlayer,
+//     ResetGame,
+//     ResetTurn,
+//     ShowPopup,
+//     UpdateRoll,
+//     UpdateScore,
+//     UpdateDie,
+//     UpdatePlayers,
+//     SetID,
+//     GameFull,
+//     /* WebRTC events*/
+//     Bye,
+//     RtcOffer,
+//     RtcAnswer,
+//     candidate,
+//     connectOffer
+// }

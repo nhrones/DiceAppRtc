@@ -3,7 +3,8 @@ import { callbackFunc } from '../../types.js'
 
 const topicSubscriptions: Map<string, callbackFunc[]> = new Map()
 
-/** registers a callback function to be executed when a topic is published
+/**
+ *  registers a callback function to be executed when a topic is published
  *	e.g.: Events.when(topic.GameOver, Game.resetGame)
  *   .. returns an object containing a 'remove' function
  *	@param topic {string} the topic of interest
@@ -13,8 +14,9 @@ const topicSubscriptions: Map<string, callbackFunc[]> = new Map()
 export const ON = (topic: string, callback: callbackFunc): { remove: any } => {
     return _registerListener(topic, callback)
 }
-//export const ON = when
-/** _registerListener
+
+/** 
+ *  _registerListener
  *	private internal function ...
  *  registers a callback function to be executed when a topic is published
  *	@param topic {string} the topic of interest
@@ -45,7 +47,8 @@ const _registerListener = (topic: string, callback: callbackFunc) => {
     }
 }
 
-/** fires an event for a topic with optional data
+/** 
+ *  fires an event for a topic with optional data
  *	e.g.: Events.fireEvent("GameOver", winner)
  *	@param {string} topic - the topic of interest
  *	@param {object} data - optional data to report to subscribers
@@ -56,7 +59,9 @@ export const Fire = (topic: string, data: {}) => {   //string | object) {
     }
 }
 
-/** private method _dispatch ... executes all registered callback functions */
+/** 
+ *  private method _dispatch ... executes all registered callback functions 
+ */
 const _dispatch = (subscriptions: Function[], data: string | object) => {
     if (subscriptions) {
         for (const callback of subscriptions) {
