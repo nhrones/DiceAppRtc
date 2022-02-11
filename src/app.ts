@@ -1,22 +1,22 @@
 
 import { DiceGame, game } from './model/diceGame.js';
 import { Container, container } from './view/container.js'
-import  * as socket  from './framework/model/signalling.js';
+import * as socket from './framework/model/signalling.js';
 import * as Players from './model/players.js';
-
-const proto = (window.location.protocol === 'http:') ? 'ws://': 'wss://';
+const { message } = socket
+const proto = (window.location.protocol === 'http:') ? 'ws://' : 'wss://';
 export const serverURL = `${proto}${window.location.host}:8000`
 //socket.initialize('wss://rtc-signal-server.deno.dev')//serverURL)
 socket.initialize(serverURL)
 
 // Once we connect with the server, it will return its 
 // request.headers('sec-websocket-key') as a new client 'ID'
-socket.onSignalRecieved(socket.message.SetID, (data: { id: string }) => {
-//     const name = prompt(`
-// Please enter your name or just
-// press enter to accept 'Player'`, "Player") || 'Player';
-const name = 'Player'
-        
+socket.onSignalRecieved(message.SetID, (data: { id: string }) => {
+    //     const name = prompt(`
+    // Please enter your name or just
+    // press enter to accept 'Player'`, "Player") || 'Player';
+    const name = 'Player'
+
     // fixes audio warnings
     const hiddenButton = document.getElementById('hidden-button')
     hiddenButton.hidden = true;
@@ -24,7 +24,7 @@ const name = 'Player'
         console.log('hiddenButton was clicked')
     }, false);
     hiddenButton.click();
-    
+
     Players.thisPlayer.id = data.id
     Players.thisPlayer.playerName = (name === 'Player') ? 'Player1' : name
     Players.setThisPlayer(Players.thisPlayer)
@@ -34,15 +34,15 @@ const name = 'Player'
     socket.registerPlayer(data.id, name)
     Players.addPlayer(data.id, name)
     if (game) { game.resetGame() }
-}) 
+})
 
 // issue a new client 'ID'
-socket.onSignalRecieved(socket.message.GameFull, () => {
+socket.onSignalRecieved(message.GameFull, () => {
     const msg = `Sorry, This game is already full!
 This tab/window will automatically close!`
     console.log(msg)
     alert(msg);
-    
+
     // close this tab/window
     self.opener = self;
     self.close();

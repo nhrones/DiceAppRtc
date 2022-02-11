@@ -5,7 +5,7 @@ import { container, ctx } from './container.js'
 import  * as socket  from '../framework/model/signalling.js'
 
 /*  aliases  */
-const { message: soc } = socket
+const { message } = socket
 
 import {  
     ON, 
@@ -60,7 +60,7 @@ export default class Popup implements View {
         })
 
         // Other web-players may broadcast a ShowPopup event at the end of a game
-        socket.onSignalRecieved(soc.ShowPopup, (data: { message: string }) => {
+        socket.onSignalRecieved(message.ShowPopup, (data: { message: string }) => {
             this.show(data.message)
         })
 

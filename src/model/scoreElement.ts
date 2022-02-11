@@ -19,7 +19,7 @@ const emptyString: string = ''
 const black = 'black'
 const infolabel = 'infolabel'
 const snow = 'snow'
-
+const UpdateScoreMsg = 60
 /** ScoreElement viewModel class */
 export default class ScoreElement {
 
@@ -33,7 +33,7 @@ export default class ScoreElement {
     scoringDieset: number[]
     scoringDiesetSum: number
     hasFiveOfaKind: boolean = false
-
+    updateScoreMsg: number
     /** constructor ... called from DiceGame.buildScoreItems()
      * @param dice {Dice} Dice dependency injection
      * @param index {number} index of this instance
@@ -48,24 +48,23 @@ export default class ScoreElement {
         this.finalValue = 0
         this.possibleValue = 0
         this.scoringDieset = [0, 0, 0, 0, 0]
-
+        this.updateScoreMsg = 100 + this.index
+        
         ///////////////////////////////////////////////    
         //               bind events                 //
         /////////////////////////////////////////////// 
         // when I select a score
         ON(`${Event.ScoreButtonTouched}${this.index}`, () => {
             // notify all other players
-            sendSignal(`${message.UpdateScore}${this.index}`,
-                {}
-            )
+            sendSignal(this.updateScoreMsg, "")
             if (this.clicked()) {
-                sendSignal(message.ResetTurn, {})
-                Fire(Event.ScoreElementResetTurn, {})
+                sendSignal(message.ResetTurn, "")
+                Fire(Event.ScoreElementResetTurn, "")
             }
         })
 
         // when other players select a score
-        onSignalRecieved(`${message.UpdateScore}${this.index}`, () => {
+        onSignalRecieved(this.updateScoreMsg, () => {
             this.clicked()
         })
 

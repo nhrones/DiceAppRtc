@@ -39,7 +39,7 @@ export const initialize = () => {
 
     // handle ICE-Candidate
     // @param {RTCIceCandidateInit} candidate - RTCIceCandidateInit
-    onSignalRecieved(message.IceCandidate, async (candidate: RTCIceCandidateInit) => {
+    onSignalRecieved(message.candidate, async (candidate: RTCIceCandidateInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
             return;
@@ -59,7 +59,7 @@ export const initialize = () => {
     })
 
     // A peer is offering to connect
-    onSignalRecieved(message.ConnectOffer, (_data: any) => {
+    onSignalRecieved(message.connectOffer, (_data: any) => {
         // I'll initiate an RTC-connection 
         // unless I'm engaged already.
         if (peerConnection) {
@@ -73,7 +73,7 @@ export const initialize = () => {
 }
 /** Start the peerConnection process by signalling an invitation */
 export const start = () => {
-    sendSignal(message.ConnectOffer, {} );
+    sendSignal(message.connectOffer, {} );
 }
 
 /** Resets the peerConnection and dataChannel, then calls 'start()' */
@@ -113,7 +113,7 @@ function createPeerConnection(isOfferer: boolean) {
             init.sdpMLineIndex = event.candidate.sdpMLineIndex;
         }
         // sent over the signaller to the remote peer.
-        sendSignal(message.IceCandidate, init);
+        sendSignal(message.candidate, init);
     };
 
     // creating data channel 
@@ -139,8 +139,13 @@ function setupDataChannel() {
     dataChannel.onopen = checkDataChannelState;
     dataChannel.onclose = checkDataChannelState;
     dataChannel.addEventListener("message", (event: { data: string }) => {
+        
         const payload = JSON.parse(event.data)
-        dispatch(payload[0], payload[1])
+        const topic = payload[0]
+        console.log(payload)
+        //const topic = (payload[0]  === message.UpdateScore) ? payload[0] + payload[1].index : payload[0]
+        console.info('DataChannel recieved topic: ', message[topic])
+        dispatch(topic, payload[1])
     })
 }
 

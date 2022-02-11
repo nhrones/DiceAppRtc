@@ -68,10 +68,10 @@ export const init = () => {
     // register a callback function for the webSocket.UpdateDie event
     // when other player touched their die ...
     onSignalRecieved(message.UpdateDie, (data: { dieNumber: number }) => {
-        const d = die[data.dieNumber]
-        if (d.value > 0) {
-            d.frozen = !d.frozen
-            updateView(data.dieNumber, d.value, d.frozen)
+        const targetDie = die[data.dieNumber]
+        if (targetDie.value > 0) {
+            targetDie.frozen = !targetDie.frozen
+            updateView(data.dieNumber, targetDie.value, targetDie.frozen)
         }
     })
 }
