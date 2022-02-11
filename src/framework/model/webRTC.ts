@@ -143,7 +143,7 @@ function setupDataChannel() {
         const payload = JSON.parse(event.data)
         const topic = payload[0]
         const tName = (topic > 59) ? 'UpdateScore' : message[topic]
-        console.info('DataChannel recieved topic: ', tName)
+        if (DEBUG) console.info('DataChannel recieved topic: ', tName)
         dispatch(topic, payload[1])
     })
 }
@@ -177,5 +177,5 @@ updateUI({ content: `Player1 is waiting for a connection from: ${location.origin
 
 //todo do-UI, use popup?
 function updateUI(msg: { content: string, clearContent?: boolean }) {
-    console.log(msg.content)
+    if (DEBUG) console.log(msg.content)
 }

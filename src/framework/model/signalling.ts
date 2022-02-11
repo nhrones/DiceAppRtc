@@ -1,10 +1,10 @@
  
 import { Event, Fire } from './events.js'
 import * as webRTC from './webRTC.js'
-import { DEBUG, callbackFunc } from '../../types.js'
+import { DEBUG } from '../../types.js'
 
 /** Each Map-entry holds an array of callback functions mapped to a topic name */
-const subscriptions = new Map<number, callbackFunc[]>()
+const subscriptions = new Map<number, Function[]>()
 
 /** this clients WebSocket connection to the server */
 export let socket: WebSocket | null = null
@@ -48,11 +48,10 @@ export const initialize = (serverURL: string) => {
 
     // set up a `message` event handler for this connection
     socket.addEventListener('message', (msg: MessageEvent) => {
-        console.info('socket recieved message.data: ', msg.data)
+        if (DEBUG) console.info('socket recieved message.data: ', msg.data)
         const payload = JSON.parse(msg.data)
         const topic = payload[0]
-        //const topic = (payload[0]  === message.UpdateScore) ? payload[0] + payload[1].index : payload[0]
-        console.info('socket recieved topic: ', message[topic])
+        if (DEBUG) console.info('socket recieved topic: ', message[topic])
         dispatch(topic, payload[1])
     })
 }
@@ -64,7 +63,7 @@ export const registerPlayer = (id: string, name: string) => {
     // At this point, we don't know our peer.
     // Since we're registering, we wait for a 'PlayerUpdate' response
     // from the  player that currently has 'focus'
-    sendSignal(message.RegisterPlayer,{ id: id, name: name })
+    sendSignal(message.RegisterPlayer,[id, name])
 }
 
 /** Dispatches a message event to all registered listeners with optional data    
@@ -73,7 +72,7 @@ export const registerPlayer = (id: string, name: string) => {
  *@param topic {string} the topic of interest
  *@param data {string | object} optional data to report to subscribers
  */
-export const dispatch = (topic: message, data: string | object) => {
+export const dispatch = (topic: message, data: string | string[] | object) => {
     if (subscriptions.has(topic)) {
         const subs = subscriptions.get(topic)!
         if (subs) {
@@ -90,7 +89,7 @@ export const dispatch = (topic: message, data: string | object) => {
  *	@param topic {string} the topic of interest
  *	@param listener {function} a callback function
  */
-export const onSignalRecieved = (topic: number, listener: callbackFunc) => {
+export const onSignalRecieved = (topic: number, listener: Function) => {
     //let subTopicString = message[topic]
     if (!subscriptions.has(topic)) {
         subscriptions.set(topic, [])
@@ -110,13 +109,13 @@ export const onSignalRecieved = (topic: number, listener: callbackFunc) => {
     //const msg = JSON.stringify( [ topic, data ] )
     const msg = JSON.stringify( [ topic, data ] )
     if (webRTC.dataChannel && webRTC.dataChannel.readyState === 'open') {
-        console.log('broadcast on DataChannel:', msg)
+        if (DEBUG) console.log('broadcast on DataChannel:', msg)
         webRTC.dataChannel.send(msg)
     } else if (socket) {
-        console.log('broadcast on WebSocket:', msg)
+        if (DEBUG) console.log('broadcast on WebSocket:', msg)
         socket.send(msg)
     } else {
-        console.error('No place to send:', msg)
+        if (DEBUG) console.error('No place to send:', msg)
     }
 }
 

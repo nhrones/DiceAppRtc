@@ -13,10 +13,10 @@ export const ICEconfiguration = {
 /** SignallingMessage type */
 export type SignallingMessage = { 
     topic: string, 
-    data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string, 
+    data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string[] | string, 
 }
 
-export type callbackFunc = (data: string | object) => void
+//export type callbackFunc = Function //(data: any) => void
 
 export type Die = {
     value: number

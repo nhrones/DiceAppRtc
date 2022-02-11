@@ -3,6 +3,8 @@ import { DiceGame, game } from './model/diceGame.js';
 import { Container, container } from './view/container.js'
 import * as socket from './framework/model/signalling.js';
 import * as Players from './model/players.js';
+import { DEBUG } from './types.js'
+
 const { onSignalRecieved, registerPlayer, message } = socket
 
 const proto = (window.location.protocol === 'http:') ? 'ws://' : 'wss://';
@@ -11,7 +13,7 @@ const thisHost = window.location.host
 if (thisHost === 'localhost' || thisHost === '127.0.0.1') {
     socket.initialize(serverURL)
 } else {
-    socket.initialize('wss://rtc-signal-server.deno.dev')//serverURL)
+    socket.initialize('wss://rtc-signal-server.deno.dev')
 }
 
 
@@ -27,7 +29,7 @@ onSignalRecieved(message.SetID, (data: { id: string }) => {
     const hiddenButton = document.getElementById('hidden-button')
     hiddenButton.hidden = true;
     hiddenButton.addEventListener('click', function () {
-        console.log('hiddenButton was clicked')
+        if (DEBUG) console.log('hiddenButton was clicked')
     }, false);
     hiddenButton.click();
 
@@ -46,7 +48,7 @@ onSignalRecieved(message.SetID, (data: { id: string }) => {
 onSignalRecieved(message.GameFull, () => {
     const msg = `Sorry, This game is already full!
 This tab/window will automatically close!`
-    console.log(msg)
+    if (DEBUG) console.log(msg)
     alert(msg);
 
     // close this tab/window

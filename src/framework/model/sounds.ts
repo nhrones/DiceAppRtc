@@ -4,9 +4,7 @@ const context = new AudioContext();
 let canPlay = true
 
 export const enabled = (enable: boolean) => {
-    //console.log(`setting sounds eabled = `, enable)
     canPlay = enable;
-    //console.log(`set canPlay = `, canPlay)
 }
 
 /** Create an audioBuffer from a base64 string */

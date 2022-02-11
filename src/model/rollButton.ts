@@ -13,15 +13,13 @@ export const init = () => {
     // when this instance rolls dice
     ON(`${Event.ButtonTouched}${kind}`, () => {
         dice.roll(null)
-        sendSignal(message.UpdateRoll,
-            {dice: dice.toString()}
-        )
+        sendSignal(message.UpdateRoll, dice.toString())
         updateRollState()
     })
 
     // when oponents rolled the dice
-    onSignalRecieved(message.UpdateRoll, (data: { dice: string }) => {
-        dice.roll(JSON.parse(data.dice))
+    onSignalRecieved(message.UpdateRoll, (diceArray: string) => {
+        dice.roll(JSON.parse(diceArray))
         updateRollState()
     })
 

@@ -2,7 +2,7 @@
 import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
 import { RTCopen } from './../framework/model/webRTC.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
-import { Player } from '../types.js'
+import { Player, DEBUG } from '../types.js'
 import { DiceGame } from './diceGame.js'
 
 const MAXPLAYERS = 2
@@ -26,9 +26,12 @@ export const init = (thisgame: DiceGame, color: string) => {
         lastScore: ''
     }
  
-    onSignalRecieved(message.RegisterPlayer, (data: { id: string, name: string }) => {
-        console.log(`WS.RegisterPlayer ${data.id}  ${data.name}`)
-        addPlayer(data.id, data.name);
+    onSignalRecieved(message.RegisterPlayer, (player: string[]) => {
+        if (DEBUG) console.info('RegisterPlayer: ', player)
+        const id = player[0]
+        const name = player[1]
+        if (DEBUG) console.log(`WS.RegisterPlayer ${id}  ${name}`)
+        addPlayer(id, name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
         sendSignal(message.UpdatePlayers, Array.from(players.values()))
@@ -36,7 +39,6 @@ export const init = (thisgame: DiceGame, color: string) => {
 
     // will only come from focused-player (currentPlayer)
     onSignalRecieved(message.UpdatePlayers, (playersArray: Player[]) => {
-        //console.info(`playersArray: ${playersArray}`)
         // clear the players set
         players.clear()
 
@@ -64,13 +66,13 @@ export const init = (thisgame: DiceGame, color: string) => {
         game.resetGame()
     })
 
-    onSignalRecieved(message.RemovePlayer, (data: { id: string, name: string }) => {
-        if (!RTCopen) {
-            removePlayer(data.id)
+    onSignalRecieved(message.RemovePlayer, (id: string) => {
+        //if (!RTCopen) { //TODO fix this
+            removePlayer(id)
             game.resetGame()
-        } else {
-            alert('Socket-Server-Closed!')
-        }
+        //} else {
+        //    alert('Socket-Server-Closed!')
+        //}
     })
 }
 
@@ -114,7 +116,7 @@ const updatePlayer = (index: number, color: string, text: string) => {
  * @param {string} id - the id of the new player
  */
 export const addPlayer = (id: string, playerName: string) => {
-    console.log('add player ', id + '  ' + playerName)
+    if (DEBUG) console.log('add player ', id + '  ' + playerName)
     if (playerName === 'Player') {
         const num = players.size + 1
         playerName = 'Player' + num;
@@ -124,7 +126,7 @@ export const addPlayer = (id: string, playerName: string) => {
         thisPlayer.playerName = playerName
         players.add(thisPlayer)
     } else {
-        console.log(`Players adding, id:${id} name: ${playerName}`)
+        if (DEBUG) console.log(`Players adding, id:${id} name: ${playerName}`)
         players.add(
             {
                 id: id,
@@ -139,7 +141,7 @@ export const addPlayer = (id: string, playerName: string) => {
         // don't update if we're just registering
         // WS.broadcast("UpdatePlayers", Array.from(this.players.values()))
     }
-    console.info(' added player', Array.from(players.values()))
+    if (DEBUG) console.info(' added player', Array.from(players.values()))
 
 }
 
@@ -149,16 +151,14 @@ export const addPlayer = (id: string, playerName: string) => {
  */
 const removePlayer = (id: string) => {
     const p = getById(id)
-    console.info(' removing player', p)
+    if (DEBUG) console.info(' removing player', p)
     if (p) players.delete(p)
     refreshPlayerColors();
     setThisPlayer([...players][0])
-    console.info(' removed player', Array.from(players.values()))
 }
 
 const getById = (id: string): Player | null => {
     for (const player of players) {
-        console.log(`player.id: ${player.id} id: ${id}`)
         if (player.id === id) {
             return player
         }
@@ -215,6 +215,6 @@ export let currentPlayer: Player = {
 }
 
 export const setCurrentPlayer = (player: Player) => {
-    console.log(`settingCurrentPlayer: ${player.playerName}`)
+    if (DEBUG) console.log(`settingCurrentPlayer: ${player.playerName}`)
     currentPlayer = player
 }

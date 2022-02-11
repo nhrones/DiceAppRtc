@@ -1,7 +1,5 @@
 
-import { callbackFunc } from '../../types.js'
-
-const topicSubscriptions: Map<string, callbackFunc[]> = new Map()
+const topicSubscriptions: Map<string, Function[]> = new Map()
 
 /**
  *  registers a callback function to be executed when a topic is published
@@ -11,7 +9,7 @@ const topicSubscriptions: Map<string, callbackFunc[]> = new Map()
  *	@param callback {function} a callback function
  *	@returns remove {object} returns an object containing a 'remove' function
  */
-export const ON = (topic: string, callback: callbackFunc): { remove: any } => {
+export const ON = (topic: string, callback: Function): { remove: any } => {
     return _registerListener(topic, callback)
 }
 
@@ -24,7 +22,7 @@ export const ON = (topic: string, callback: callbackFunc): { remove: any } => {
  *	@param once {boolean} if true ... fire once then unregister
  *	@return remove {object} returns an object containing a 'remove' function
  */
-const _registerListener = (topic: string, callback: callbackFunc) => {
+const _registerListener = (topic: string, callback: Function) => {
 
     if (!topicSubscriptions.has(topic)) {
         topicSubscriptions.set(topic, [])
