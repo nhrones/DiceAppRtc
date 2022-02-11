@@ -128,7 +128,6 @@ function handleMouseMove(evt: MouseEvent, ) {
  */ 
 function handleClickOrTouch(mX: number, mY: number) {
     hit = false
-    console.log(`clicked: currentID: ${currentPlayer.id} thisID: ${thisPlayer.id}`)
     // reject all local events when not our turn
     if (currentPlayer.id === thisPlayer.id) {
         x = mX - canvas.offsetLeft
