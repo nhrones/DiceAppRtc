@@ -143,30 +143,6 @@ export const onSignalRecieved = (topic: number, listener: callbackFunc) => {
 //     ConnectOffer: 'connectOffer'
 // }
 
-
-/** exported socket event message list */
-// export enum message {
-//     /* game events */
-//     RegisterPlayer = 'RegisterPlayer', // socket.js:69
-//     RemovePlayer = 'RemovePlayer', // players.js:
-//     ResetGame = 'ResetGame', // diceGame.js:30
-//     ResetTurn = 'ResetTurn', // diceGame.js:24
-//     ShowPopup = 'ShowPopup', // popup.js:30
-//     UpdateRoll = 'UpdateRoll', // rollButton.js:13
-//     UpdateScore = 'UpdateScore', // scoreElement.js:31
-//     UpdateDie = 'UpdateDie', // dice.js:32
-//     UpdatePlayers = 'UpdatePlayers', // players.js:17
-//     SetID = "SetID",  // app.js:5
-//     GameFull = "GameFull", // app.js 29
-
-//     /* WebRTC events*/
-//     Bye = 'bye',
-//     RtcOffer = 'RtcOffer',
-//     RtcAnswer = 'RtcAnswer',
-//     IceCandidate = 'candidate',
-//     ConnectOffer = 'connectOffer'
-// }
-
 /** exported socket event message list */
 export enum message {
     /* game events */

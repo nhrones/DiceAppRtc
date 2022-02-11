@@ -1,5 +1,6 @@
 
 import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
+import { RTCopen } from './../framework/model/webRTC.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
 import { Player } from '../types.js'
 import { DiceGame } from './diceGame.js'
@@ -64,8 +65,12 @@ export const init = (thisgame: DiceGame, color: string) => {
     })
 
     onSignalRecieved(message.RemovePlayer, (data: { id: string, name: string }) => {
-        removePlayer(data.id)
-        game.resetGame()
+        if (!RTCopen) {
+            removePlayer(data.id)
+            game.resetGame()
+        } else {
+            alert('Socket-Server-Closed!')
+        }
     })
 }
 

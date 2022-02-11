@@ -7,6 +7,7 @@ export let peerConnection: RTCPeerConnection;
 
 /** The RTCDataChannel API enables peer-to-peer exchange of data */
 export let dataChannel: RTCDataChannel;
+export let RTCopen = false
 
 export const initialize = () => {
 
@@ -151,12 +152,14 @@ function setupDataChannel() {
 
 function checkDataChannelState() {
     if (dataChannel.readyState === 'open') {
+        RTCopen = true
         updateUI({ content: `Player1 is now connected to Player2`, clearContent: true });
     } else if (dataChannel.readyState === 'closed') {
         updateUI({
             content: `Player2 was disconnected! 
 Waiting for new offer on: ${location.origin}`, clearContent: true
         });
+        RTCopen = false
         // reset everything and restart
         reset()
     }
