@@ -1,10 +1,15 @@
  
 import { Event, Fire } from './events.js'
 import * as webRTC from './webRTC.js'
-import { DEBUG } from '../../types.js'
+import { DEBUG, SignallingMessage } from '../../types.js'
 
 /** Each Map-entry holds an array of callback functions mapped to a topic name */
 const subscriptions = new Map<number, Function[]>()
+
+/**
+ * array of scoring transactions
+ */
+const transactions: SignallingMessage[] = []
 
 /** this clients WebSocket connection to the server */
 export let socket: WebSocket | null = null
@@ -66,13 +71,16 @@ export const registerPlayer = (id: string, name: string) => {
     sendSignal(message.RegisterPlayer,[id, name])
 }
 
-/** Dispatches a message event to all registered listeners with optional data    
- *	
- *@example dispatch( "GameOver", winner )    
- *@param topic {string} the topic of interest
- *@param data {string | object} optional data to report to subscribers
+/** 
+ * Dispatches a message event to all registered listeners with optional data     
+ * Called from both `socket.onmessage` and from WebRTC.`dataChannel.onmessage`. 	  
+ * @example dispatch( "GameOver", winner )    
+ * @param topic {string} the topic of interest
+ * @param data {string | object} optional data to report to subscribers
  */
 export const dispatch = (topic: message, data: string | string[] | object) => {
+    
+    
     if (subscriptions.has(topic)) {
         const subs = subscriptions.get(topic)!
         if (subs) {

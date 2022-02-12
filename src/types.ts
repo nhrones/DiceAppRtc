@@ -12,11 +12,17 @@ export const ICEconfiguration = {
 
 /** SignallingMessage type */
 export type SignallingMessage = { 
-    topic: string, 
+    topic: number, 
     data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string[] | string, 
 }
+/** ScoringMessage type */
+export type ScoringMessage = { 
+    index: number,
+    owner: number, 
+    value: number 
+}
 
-//export type callbackFunc = Function //(data: any) => void
+export type signalData = Object | string[] | string
 
 export type Die = {
     value: number

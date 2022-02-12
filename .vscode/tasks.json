@@ -1,87 +1,103 @@
-// {
-//     // See https://go.microsoft.com/fwlink/?LinkId=733558
-//     // for the documentation about the tasks.json format
-//     "version": "2.0.0",
-//     "tasks": [
-//         {
-//             "label": "Deno Run App Server",
-//             "type": "shell",
-//             "command": "deno",
-//             "options": {
-//                 "cwd": "../DiceAppServer"
-//             },
-//             "args": [
-//                 "run",
-//                 "--watch",
-//                 "--unstable",
-//                 "--allow-env", 
-//                 "--allow-read",
-//                 "--allow-net", 
-//                 "server.ts"
-//             ],
-//             "windows": {
-//                 "options": {
-//                     "cwd": "../DiceAppServer"
-//                 },
-//                 "command": "deno",
-//                 "args": [
-//                     "run",
-//                     "--watch",
-//                     "--unstable",
-//                     "--allow-env",
-//                     "--allow-read",
-//                     "--allow-net",  
-//                     "server.ts"
-//                 ]
-//             },
-//             "group": "none",
-//             "presentation": {
-//                 "reveal": "always",
-//                 "focus": true,
-//                 "panel": "new",
-//                 "clear": true,
-//                 "showReuseMessage": false
-//             },
-//             "problemMatcher": []
-//         },
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run App Server",
+            "type": "shell",
+            "command": "deno",
+            "options": {
+                "cwd": "../RtcDiceAppServer",
+                "env": {
+                    "DEBUG": "true", 
+                    "DENO_REGION" : "localhost"
+                },
+            },
+            "args": [
+                "run",
+                "--watch",
+                "--unstable",
+                "--allow-env", 
+                "--allow-read",
+                "--allow-net", 
+                "server.ts"
+            ],
+            "windows": {
+                "options": {
+                    "cwd": "../RtcDiceAppServer",
+                    "env": {
+                        "DEBUG": "true", 
+                        "DENO_REGION" : "localhost"
+                    },
+                },
+                "command": "deno",
+                "args": [
+                    "run",
+                    "--watch",
+                    "--unstable",
+                    "--allow-env",
+                    "--allow-read",
+                    "--allow-net",  
+                    "server.ts"
+                ]
+            },
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "clear": true,
+                "showReuseMessage": false
+            },
+            "problemMatcher": []
+        },
         
-//         {
-//             "label": "Deno Run Socket Server",
-//             "type": "shell",
-//             "command": "deno",
-//             "options": {
-//                 "cwd": "../DiceSocketServer"
-//             },
-//             "args": [
-//                 "run",
-//                 "--watch",
-//                 "--unstable",
-//                 "--allow-env", 
-//                 "--allow-net", 
-//                 "socketServer.ts"
-//             ],
-//             "windows": {
-//                 "options": {
-//                     "cwd": "../DiceSocketServer"
-//                 },
-//                 "command": "deno",
-//                 "args": [
-//                     "run",
-//                     "--watch",
-//                     "--unstable",
-//                     "--allow-env",
-//                     "--allow-net",  
-//                     "socketServer.ts"
-//                 ]
-//             },
-//             "presentation": {
-//                 "reveal": "always",
-//                 "focus": true,
-//                 "panel": "new",
-//                 "clear": true,
-//                 "showReuseMessage": false
-//             },
-//             "problemMatcher": []
-//         }
-//     ]
-// }
+        {
+            "label": "Run Signal Server",
+            "type": "shell",
+            "command": "deno",
+            "options": {
+                "cwd": "../RtcSignalServer",
+                "env": {
+                    "DEBUG": "true", 
+                    "DENO_REGION" : "localhost"
+                },
+            },
+            "args": [
+                "run",
+                "--watch",
+                "--unstable",
+                "--allow-env", 
+                "--allow-net", 
+                "server.ts"
+            ],
+            "windows": {
+                "options": {
+                    "cwd": "../RtcSignalServer",
+                    "env": {
+                        "DEBUG": "true", 
+                        "DENO_REGION" : "localhost"
+                    },
+                },
+                "command": "deno",
+                "args": [
+                    "run",
+                    "--watch",
+                    "--unstable",
+                    "--allow-env",
+                    "--allow-net",  
+                    "server.ts"
+                ]
+            },
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "clear": true,
+                "showReuseMessage": false
+            },
+            "problemMatcher": []
+        }
+    ]
+}

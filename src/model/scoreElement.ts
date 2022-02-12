@@ -213,9 +213,9 @@ export default class ScoreElement {
 
     /** sets the value of this scoreElement after taken by a player */
     setValue() {
+        //TODO SET transaction result here?
         this.setOwned(true)
-        const thisValue = this.possibleValue
-        this.finalValue = thisValue
+        this.finalValue = this.possibleValue
         this.scoringDiesetSum = 0
         // DO NOT use for/of here! needs index
         this.scoringDieset.forEach((_die: number, index: number) => {
@@ -238,7 +238,7 @@ export default class ScoreElement {
         }
         else {
             this.hasFiveOfaKind = false
-            if (thisValue === 0) {
+            if (this.finalValue === 0) {
                 PlaySound.Dohh()
             }
             else {
