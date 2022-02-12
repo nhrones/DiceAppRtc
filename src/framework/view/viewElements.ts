@@ -24,7 +24,7 @@ export const activeNodes: Set<View> = new Set()
 /** adds a new view element to the nodes and/or activeNodes collections */
 export const add = (view: View) => {
 
-    // add all views to nodes colection
+    // add all views to our nodes colection
     nodes.add(view as View)
 
     // is this an 'active-view' (has a hovered property?)
