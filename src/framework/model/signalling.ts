@@ -3,7 +3,9 @@ import { Event, Fire } from './events.js'
 import * as webRTC from './webRTC.js'
 import { DEBUG, SignallingMessage } from '../../types.js'
 
-/** Each Map-entry holds an array of callback functions mapped to a topic name */
+/** 
+ * Each Map-entry holds an array of callback functions mapped to a topic name 
+ */
 const subscriptions = new Map<number, Function[]>()
 
 /**
@@ -11,10 +13,14 @@ const subscriptions = new Map<number, Function[]>()
  */
 const transactions: SignallingMessage[] = []
 
-/** this clients WebSocket connection to the server */
+/** 
+ * this clients WebSocket connection to the server 
+ */
 export let socket: WebSocket | null = null
 
-/** Initializes this websocket service event listeners */
+/** 
+ * Initializes this websocket service event listeners 
+ */
 export const initialize = (serverURL: string) => {
     if (DEBUG) console.log('initializing socket at: ', serverURL)
     // if we've already initialized just return
@@ -61,7 +67,8 @@ export const initialize = (serverURL: string) => {
     })
 }
 
-/** Notify the server ... we're registering as a new player    
+/** 
+ * Notify the server ... we're registering as a new player    
  * called from app.ts line# 15 
  * */
 export const registerPlayer = (id: string, name: string) => {
@@ -93,12 +100,11 @@ export const dispatch = (topic: message, data: string | string[] | object) => {
 
 /**
  *  registers a callback function to be executed when a topic is published
- *	@example Socket.when("GameOver", Game.resetGame)
+ *	@example onSignalRecieved(message.ResetTurn, this.resetTurn)
  *	@param topic {string} the topic of interest
  *	@param listener {function} a callback function
  */
 export const onSignalRecieved = (topic: number, listener: Function) => {
-    //let subTopicString = message[topic]
     if (!subscriptions.has(topic)) {
         subscriptions.set(topic, [])
     }
@@ -124,7 +130,9 @@ export const onSignalRecieved = (topic: number, listener: Function) => {
     }
 }
 
-/** signal event message list */
+/** 
+ * signal event message list 
+ */
 export enum message {
     
     /* game events */
