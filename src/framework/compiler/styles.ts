@@ -30,8 +30,8 @@ function fixNums(value: string) {
 
 /**
  * returns all attributes and styles for an element
- * @param element {HTMLElement} the element of interest
- * @returns {object} a styles object (name/value pairs)
+ * @param(HTMLElement) element - the element of interest
+ * @returns(object) a styles object (name/value pairs)
  */
 export function getStyles(element: HTMLElement){
     

@@ -11,6 +11,9 @@ export let peerConnection: RTCPeerConnection;
 export let dataChannel: RTCDataChannel;
 export let RTCopen = false
 
+/**
+ * initialize a WebRtc signalling session
+ */
 export const initialize = () => {
 
     // handle a Session-Description-Offer 
@@ -31,7 +34,7 @@ export const initialize = () => {
     })
 
     // handle a Session-Description-Answer 
-    // @param {RTCSessionDescriptionInit} answer - {type: string, sdp: string}
+    // @param(RTCSessionDescriptionInit) answer - {type: string, sdp: string}
     onSignalRecieved(message.RtcAnswer, async (answer: RTCSessionDescriptionInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
@@ -41,7 +44,7 @@ export const initialize = () => {
     })
 
     // handle ICE-Candidate
-    // @param {RTCIceCandidateInit} candidate - RTCIceCandidateInit
+    // param(RTCIceCandidateInit) candidate - RTCIceCandidateInit
     onSignalRecieved(message.candidate, async (candidate: RTCIceCandidateInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
@@ -83,7 +86,7 @@ export const start = () => {
 }
 
 /** 
- * Resets the peerConnection and dataChannel, then calls 'start()' 
+ * Resets the peerConnection and dataChannel, and calls 'start()' 
  */
 const reset = () => {
     dataChannel = null
@@ -93,7 +96,7 @@ const reset = () => {
 
 /** 
  * creates a peer connection 
- * @param {boolean} - isOfferer - we're making the offer     
+ * @param(boolean) isOfferer - are we making the offer?     
  *   true when called by makeConnection() - we are sending an offer    
  *   false when called from signaller.when('RtcOffer') - someone else sent us an offer
  */

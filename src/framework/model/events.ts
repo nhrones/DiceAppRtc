@@ -5,9 +5,9 @@ const topicSubscriptions: Map<string, Function[]> = new Map()
  *  registers a callback function to be executed when a topic is published
  *	@example ON(Event.GameOver, Game.resetGame)
  *   .. returns an object containing a 'remove' function
- *	@param topic {string} the topic of interest
- *	@param callback {function} a callback function
- *	@returns remove {object} returns an object containing a 'remove' function
+ *	@param(string) topic - the topic of interest
+ *	@param(function) callback - a callback function
+ *	@returns(object) returns an object containing a 'remove' function
  */
 export const ON = (topic: string, callback: Function): { remove: any } => {
     return _registerListener(topic, callback)
@@ -17,9 +17,9 @@ export const ON = (topic: string, callback: Function): { remove: any } => {
  *  _registerListener
  *	private internal function ...
  *  registers a callback function to be executed when a topic is published
- *	@param topic {string} the topic of interest
- *	@param callback {function} a callback function
- *	@return remove {object} returns an object containing a 'remove' function
+ *	@param (string) topic - the topic of interest
+ *	@param (function) callback - a callback function
+ *	@return (object) returns an object containing a 'remove' function
  */
 const _registerListener = (topic: string, callback: Function) => {
 
@@ -44,8 +44,8 @@ const _registerListener = (topic: string, callback: Function) => {
 /** 
  *  fires an event for a topic with optional data
  *	@example Fire(Event.UpdateDie, value)
- *	@param {string} topic - the topic of interest
- *	@param {object} data - optional data to report to subscribers
+ *	@param(string) topic - the topic of interest
+ *	@param(object) data - optional data to report to subscribers
  */
 export const Fire = (topic: string, data: {}) => {   //string | object) {
     if (topicSubscriptions.has(topic)) {

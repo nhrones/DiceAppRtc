@@ -188,8 +188,8 @@ const setTheStraightsMask = () => {
 /** 
  * Tests for pairs, triplets, ...   
  * thisManySets parameter is used to evaluate for two-pair
- * @param multipleSize {number} how many of each number
- * @param thisManySets {number} how many sets of above
+ * @param(number) multipleSize - how many of each number
+ * @param(number) thisManySets - how many sets of above
  */
 const testForMultiples = (multipleSize: number, thisManySets: number) => {
     let count = 0

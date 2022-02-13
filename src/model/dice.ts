@@ -44,7 +44,9 @@ export const setfiveOfaKindCount = (val: number) => {
     fiveOfaKindCount = val
 }
 
-/** init */
+/** 
+ * init 
+ */
 export const init = () => {
 
     ///////////////////////////////////////////////
@@ -75,7 +77,9 @@ export const init = () => {
     })
 }
 
-/** Resets Dice at the end of a players turn. */
+/** 
+ * Resets Dice at the end of a players turn. 
+ */
 export const resetTurn = () => {
     die.forEach((thisDie: Die, index: number) => {
         thisDie.frozen = false
@@ -86,7 +90,9 @@ export const resetTurn = () => {
     sum = 0
 }
 
-/** Resets this viewModel for a new game-play */
+/** 
+ * Resets this viewModel for a new game-play 
+ */
 export const resetGame = () => {
     resetTurn()
     isFiveOfaKind = false
@@ -95,8 +101,9 @@ export const resetGame = () => {
     fiveOfaKindWasSacrificed = false
 }
 
-/** roll the dice ...
- * @param dieValues {number[] | null} 
+/** 
+ * roll the dice ...
+ * @param(number[] | null) dieValues -
  *      If 'local-roll', dieValues parameter will be null.
  *      Otherwise, dieValues parameter will be the values
  *      from another players roll.
@@ -125,16 +132,19 @@ export const roll = (dieValues: number[] | null) => {
 
 }
 
-/** broadcasts an event to trigger a 'view' update
- * @param index {number} the index of the Die view to update
- * @param value {number} the die value to show in the view
- * @param frozen {boolean} the frozen state of this die
+/** 
+ * broadcasts an event to trigger a 'view' update
+ * @param(number) index - the index of the Die view to update
+ * @param(number) value - the die value to show in the view
+ * @param(boolean) frozen - the frozen state of this die
  */
 const updateView = (index: number, value: number, frozen: boolean) => {
     Fire(Event.UpdateDie + index, { value: value, frozen: frozen })
 }
 
-/** returns the set of die values as a formatted string */
+/** 
+ * returns the set of die values as a formatted string 
+ */
 export const toString = () => {
     let str = '['
     die.forEach((thisDie: Die, index: number) => {

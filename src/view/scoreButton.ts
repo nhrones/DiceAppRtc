@@ -39,11 +39,11 @@ export default class ScoreButton implements View {
 
     /** 
      * Creates an instance of a virtual ScoreButton.
-     * @param {number} index
-     * @param {string} name
-     * @param {iGeometry} geometry
-     * @param {boolean} isLeftHanded
-     * @param {string} text
+     * @param(number index
+     * @param(string) name
+     * @param(Geometry) geometry
+     * @param(boolean) isLeftHanded
+     * @param(string) text
      */
     constructor(index: number, name: string, geometry: Geometry,
         isLeftHanded: boolean, text: string) {

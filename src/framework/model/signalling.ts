@@ -82,11 +82,10 @@ export const registerPlayer = (id: string, name: string) => {
  * Dispatches a message event to all registered listeners with optional data     
  * Called from both `socket.onmessage` and from WebRTC.`dataChannel.onmessage`. 	  
  * @example dispatch( message.ResetTurn, {currentPlayerIndex: 1} )    
- * @param topic {string} the topic of interest
- * @param data {string | object} optional data to report to subscribers
+ * @param(string) topic - the topic of interest
+ * @param(string | object) - data - optional data to report to subscribers
  */
 export const dispatch = (topic: message, data: string | string[] | object) => {
-    
     
     if (subscriptions.has(topic)) {
         const subs = subscriptions.get(topic)!
@@ -101,8 +100,8 @@ export const dispatch = (topic: message, data: string | string[] | object) => {
 /**
  *  registers a callback function to be executed when a topic is published
  *	@example onSignalRecieved(message.ResetTurn, this.resetTurn)
- *	@param topic {string} the topic of interest
- *	@param listener {function} a callback function
+ *	@param(string) topic - the topic of interest
+ *	@param(function) listener - a callback function
  */
 export const onSignalRecieved = (topic: number, listener: Function) => {
     if (!subscriptions.has(topic)) {
@@ -114,8 +113,8 @@ export const onSignalRecieved = (topic: number, listener: Function) => {
 
 /**
  *  sends a message to the server to be broadcast to subscribers
- *	@param {string} topic - the topic of interest
- *	@param {object} data - the data object to send
+ *	@param(string) topic - the topic of interest
+ *	@param(object) data - the data object to send
  */
  export const sendSignal = (topic: message, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {   
     const msg = JSON.stringify( [ topic, data ] )

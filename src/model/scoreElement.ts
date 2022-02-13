@@ -39,9 +39,9 @@ export default class ScoreElement {
     
     /** 
      * constructor ... called from DiceGame.buildScoreItems()
-     * @param dice {Dice} Dice dependency injection
-     * @param index {number} index of this instance
-     * @param name {string} the name of this instance
+     * @param(Dice) dice - Dice dependency injection
+     * @param(number) index - index of this instance
+     * @param(string) name - the name of this instance
      */
     constructor(index: number, name: string) {
 

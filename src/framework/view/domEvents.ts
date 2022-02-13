@@ -76,11 +76,12 @@ export function initHandlers(): void {
 //                  local functions                 \\
 ///////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-/** Handles canvas mouse-move event.     
+/** 
+ * Handles canvas mouse-move event.     
  * Provides logic to emulate 'onmouseenter', and        
  * 'onmouseleave' DOM events on our virtual elements.    
  * Uses the canvasContexts 'isPointInPath' method for hit-testing.    
- * @param {MouseEvent} evt - from canvas.mousemove event  
+ * @param(MouseEvent) evt - from canvas.mousemove event  
  */
 function handleMouseMove(evt: MouseEvent,) {
 
@@ -113,13 +114,14 @@ function handleMouseMove(evt: MouseEvent,) {
     }
 }
 
-/** Handles both, canvas-mouse-Click and canvas-Touch events.    
+/** 
+ * Handles both, canvas-mouse-Click and canvas-Touch events.    
  * Uses the canvasContexts 'isPointInPath' method for hit-testing.     
  * If a hit is detected, calls the elements touched() method.    
  * The elements touched() method will then broadcast an 'event' to all subscribers.   
  * 
- * @param {number} mX - an adjusted horizontal position of this event
- * @param {number} mY - an adjusted vertical position of this event
+ * @param(number) mX - an adjusted horizontal position of this event
+ * @param(number) mY - an adjusted vertical position of this event
  */
 function handleClickOrTouch(mX: number, mY: number) {
     hit = false

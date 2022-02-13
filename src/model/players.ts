@@ -119,7 +119,7 @@ const updatePlayer = (index: number, color: string, text: string) => {
 /** 
  * add a new player,  
  * broadcasts `UpdatePlayers` (will ResetGame) 
- * @param {string} id - the id of the new player
+ * @param(string) id - the id of the new player
  */
 export const addPlayer = (id: string, playerName: string) => {
     if (DEBUG) console.log('add player ', id + '  ' + playerName)
@@ -154,7 +154,7 @@ export const addPlayer = (id: string, playerName: string) => {
 /** 
  * removes a Player    
  * called when the players webSocket has closed    
- * @param {string} id - the id of the player to be removed
+ * @param(string) id - the id of the player to be removed
  */
 const removePlayer = (id: string) => {
     const p = getById(id)

@@ -45,8 +45,8 @@ export class Container {
     /** 
      * Container singleton initialization.
      * Called from DOMContentLoaded event handler (app.js)
-     * @param canvas {HTMLCanvasElement} Canvas dependency injection
-     * @param color {string} the background color of the canvas
+     * @param(HTMLCanvasElement) canvas - Canvas dependency injection
+     * @param(string) color - the background color of the canvas
      */
     static init(canvas: HTMLCanvasElement, color: string) {
 
@@ -142,8 +142,8 @@ export class Container {
 
     /** 
      * Initialize and return a canvasContext2D object for this HTMLCanvasElement
-     * @param canvas {HTMLCanvasElement} the canvas element
-     * @param color {string} an initial color for both stroke and fill styles
+     * @param(HTMLCanvasElement) canvas - the canvas element
+     * @param(string) color - an initial color for both stroke and fill styles
      */
     initCanvasContext(canvas: HTMLCanvasElement, color: string) {
         const ctx = canvas.getContext('2d')
