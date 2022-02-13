@@ -19,11 +19,12 @@ if (thisHost === 'localhost' || thisHost === '127.0.0.1') {
 
 // Once we connect with the server, it will return its 
 // request.headers('sec-websocket-key') as a new client 'ID'
-onSignalRecieved(message.SetID, (data: { id: string }) => {
+onSignalRecieved(message.SetID, (data:{id: string, role: number}) => {
+    console.info('message.SetID: data = ', data)
     //     const name = prompt(`
     // Please enter your name or just
     // press enter to accept 'Player'`, "Player") || 'Player';
-    const name = 'Player'
+    let name = 'Player'+ data.role
 
     // fixes audio warnings
     const hiddenButton = document.getElementById('hidden-button')
@@ -34,7 +35,7 @@ onSignalRecieved(message.SetID, (data: { id: string }) => {
     hiddenButton.click();
 
     Players.thisPlayer.id = data.id
-    Players.thisPlayer.playerName = (name === 'Player') ? 'Player1' : name
+    Players.thisPlayer.playerName =  name
     Players.setThisPlayer(Players.thisPlayer)
     Players.setCurrentPlayer(Players.thisPlayer)
     // now that we have a unique ID, 

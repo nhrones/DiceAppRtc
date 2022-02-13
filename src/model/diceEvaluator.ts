@@ -45,7 +45,7 @@ const binaryFaceValue = [0, 1, 2, 4, 8, 16, 32] // (0=0, 1=1, 2=2, 3=4, 4=8, 5=1
     export let hasFullHouse = false
     export let hasSmallStr = false
     export let hasLargeStr = false
-    export let hasFullStr = false
+
 
     ///** a private instance of the DiceEvaluator class.   
     // * Exposed only by the static DiceEvaluator.init() method */
@@ -122,7 +122,6 @@ const binaryFaceValue = [0, 1, 2, 4, 8, 16, 32] // (0=0, 1=1, 2=2, 3=4, 4=8, 5=1
         hasFullHouse = false
         hasSmallStr = false
         hasLargeStr = false
-        hasFullStr = false
 
         for (let i = 0; i < 7; i++) {
             if (countOfDieFaceValue[i] === 5) {

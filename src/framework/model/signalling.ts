@@ -169,5 +169,5 @@ export enum message {
     RtcOffer,
     RtcAnswer,
     candidate,
-    connectOffer
+    invitation
 }

@@ -19,34 +19,49 @@ const Chance: number = 12
 /** the index value of the Five of a kind scoreElement */
 export const FiveOfaKindIndex: number = FiveOfaKind
 
-/** evaluates the possible value of a scoreElement */
-export const evaluate = (id: number) => {
-    return (id < 6) ? evaluateNumbers(id) : evaluateCommon(id)
+/** 
+ * evaluates the possible value of a scoreElement 
+ * @param(number) elementID - the id of the scoreElement being evaluated
+ * @returns(number) - the value this element would score with current dice values
+ */
+export const evaluate = (elementID: number) => {
+    if (elementID < 6) {
+        // element ids are zero-based, so 'ones'->'sixes' are id 0-5 
+        // we'll add one to the id to get the die value we want to evaluate for
+        return evaluateNumber(elementID + 1)
+    } else {
+        // element ids greater than 5 have unique poker scoring values  
+        return evaluateCommon(elementID)
+    }
 }
 
-/** evaluate for common poker scores */
-const evaluateCommon = (id: number) => {
-    if (id === FiveOfaKind) {
+/** 
+ * evaluate for common poker scores 
+ * @param(number) element - the id of the scoreElement being evaluated
+ * @returns(number) - the value this element would score with current dice values
+ */
+const evaluateCommon = (element: number) => {
+    if (element === FiveOfaKind) {
         return (evaluator.hasFiveOfaKind) ? 50 : 0
     }
-    else if (id === SmallStraight) {
+    else if (element === SmallStraight) {
         return (evaluator.hasSmallStr) ? 30 : 0
     }
-    else if (id === LargeStraight) {
+    else if (element === LargeStraight) {
         return (evaluator.hasLargeStr) ? 40 : 0
     }
-    else if (id === House) {
+    else if (element === House) {
         return (evaluator.hasFullHouse) ? 25 : 0
     }
-    else if (id === FourOfaKind) {
+    else if (element === FourOfaKind) {
         return (evaluator.hasQuads || evaluator.hasFiveOfaKind) ?
             evaluator.sumOfAllDie : 0
     }
-    else if (id === ThreeOfaKind) {
+    else if (element === ThreeOfaKind) {
         return (evaluator.hasTrips || evaluator.hasQuads || evaluator.hasFiveOfaKind) ?
             evaluator.sumOfAllDie : 0
     }
-    else if (id === Chance) {
+    else if (element === Chance) {
         return evaluator.sumOfAllDie
     }
     else {
@@ -54,10 +69,13 @@ const evaluateCommon = (id: number) => {
     }
 }
 
-/** evaluates for the number of dice with this face value */
-const evaluateNumbers = (id: number) => {
+/** 
+ * evaluates for the number of dice with this face value 
+ * @param(number) thisNumber - the number to evaluate for
+ */
+const evaluateNumber = (target: number) => {
     let hits = 0
-    const target = id + 1
+    //const target = thisNumber + 1
     for (let i = 0; i < 5; i++) {
         const val = (dice.die[i]).value
         if (val === target) {

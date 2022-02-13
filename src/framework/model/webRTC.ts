@@ -60,7 +60,7 @@ export const initialize = () => {
     })
 
     // A peer is offering to connect
-    onSignalRecieved(message.connectOffer, (_data: any) => {
+    onSignalRecieved(message.invitation, (_data: any) => {
         // I'll initiate an RTC-connection 
         // unless I'm engaged already.
         if (peerConnection) {
@@ -74,7 +74,7 @@ export const initialize = () => {
 }
 /** Start the peerConnection process by signalling an invitation */
 export const start = () => {
-    sendSignal(message.connectOffer, {} );
+    sendSignal(message.invitation, {} );
 }
 
 /** Resets the peerConnection and dataChannel, then calls 'start()' */
