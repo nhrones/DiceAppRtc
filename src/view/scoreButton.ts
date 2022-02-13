@@ -9,7 +9,9 @@ import {
     Fire 
 } from '../framework/model/events.js'
 
-/** A virtual ScoreButton view class */
+/** 
+ * A virtual ScoreButton view class 
+ */
 export default class ScoreButton implements View {
 
     id: number = 0 // assigned by activeViews.add()    
@@ -35,7 +37,8 @@ export default class ScoreButton implements View {
     lowerName: Label | null = null
     scoreBox: Label | null = null
 
-    /** Creates an instance of a virtual ScoreButton.
+    /** 
+     * Creates an instance of a virtual ScoreButton.
      * @param {number} index
      * @param {string} name
      * @param {iGeometry} geometry
@@ -79,7 +82,9 @@ export default class ScoreButton implements View {
             })
     }
 
-    /** called by the view container when this element has been touched */
+    /** 
+     * called by the view container when this element has been touched 
+     */
     touched() {
         Fire(Event.ScoreButtonTouched + this.index, {})
     }
@@ -90,7 +95,9 @@ export default class ScoreButton implements View {
         this.renderScore(this.scoreText, this.available)
     }
 
-    /** render this vitual ScoreButtons shape (path) onto the canvas */
+    /** 
+     * render this vitual ScoreButtons shape (path) onto the canvas 
+     */
     render() {
         ctx.save()
         ctx.lineWidth = 5
@@ -114,7 +121,9 @@ export default class ScoreButton implements View {
         }
     }
 
-    /** renders the score value inside the vitual ScoreButton view */
+    /** 
+     * renders the score value inside the vitual ScoreButton view 
+     */
     renderScore(scoretext: string, available: boolean) {
         let scoreBoxColor = (available) ? 'blue' : this.color
         if (scoretext === '') {

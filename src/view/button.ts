@@ -4,7 +4,9 @@ import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import Label from './label.js'
 
-/** A virtual Button view class */
+/** 
+ * A virtual Button view class 
+ */
 export default class Button implements View {
 
     id: number = 0 // assigned by activeViews.add() 
@@ -22,7 +24,9 @@ export default class Button implements View {
     textLabel: Label
     text: string = ""
 
-    /** ctor that instantiates a new vitual Button view */
+    /** 
+     * constructor that instantiates a new vitual Button view 
+     */
     constructor(name: string, text: string, geometry: Geometry, path: Path2D) {
 
         this.name = name
@@ -44,8 +48,8 @@ export default class Button implements View {
         this.render()
 
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-        //                         bind events                       \\
-        ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        //                         bind events                      \\
+        ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         // the viewModel will emit this event whenever it needs to update this view
         ON(Event.UpdateButton + this.name,
@@ -57,19 +61,25 @@ export default class Button implements View {
             })
     }
 
-    /** called by the view container when this element has been touched */
+    /** 
+     * called by the view container when this element has been touched 
+     */
     touched() {
         if (this.enabled) {
             Fire(Event.ButtonTouched + this.name, {})
         }
     }
 
-    /** updates and renders the Button view */
+    /** 
+     * updates and renders the Button view 
+     */
     update() {
         this.render()
     }
 
-    /** render this Buttons shape (path) onto the canvas */
+    /** 
+     * render this Buttons shape (path) onto the canvas 
+     */
     render() {
         ctx.save()
         ctx.lineWidth = 2

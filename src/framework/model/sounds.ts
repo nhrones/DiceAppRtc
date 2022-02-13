@@ -62,7 +62,7 @@ let selectBuf: AudioBuffer
 let woohooBuf: AudioBuffer
 let loaded = false
 
-// called from the private constructor above
+// called on startup (bottom of this module)
 const init = async () => {
     cluckBuf = await makeBuffer(cluck)
     dohhBuf = await makeBuffer(dohh)

@@ -3,7 +3,8 @@ import { ON, Event, Fire } from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { ctx } from './container.js'
 
-/** a class that creates instances of virtual Die    
+/** 
+ * a class that creates instances of virtual Die    
  *  elements that are to be rendered to a canvas
  */
 export default class Die implements View {
@@ -70,7 +71,9 @@ export default class Die implements View {
     }
 }
 
-/** A set of Die face images */
+/** 
+ * A set of Die face images 
+ */
 Die.faces = [
     new ImageData(1, 1),
     new ImageData(1, 1),
@@ -80,7 +83,9 @@ Die.faces = [
     new ImageData(1, 1)
 ]
 
-/** A set of frozen Die face images */
+/** 
+ * A set of frozen Die face images 
+ */
 Die.frozenFaces = [
     new ImageData(1, 1),
     new ImageData(1, 1),

@@ -4,7 +4,13 @@ import { initHandlers } from '../framework/view/domEvents.js'
 import { compileUI } from '../framework/compiler/compiler.js'
 
 //TODO set this from Deno.env
-const DEV = 0 // 1 = true = compile; 0 = false = compile only if storage not found
+/**
+ * DEV environment constant
+ * @constant number 
+ *  1 = true = compile and save to localStorage;
+ *  0 = false = compile only if localStorage not found
+ */
+const DEV = 0
 
 ///////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //         exported for faster resolution           \\
@@ -13,7 +19,8 @@ const DEV = 0 // 1 = true = compile; 0 = false = compile only if storage not fou
 export let ctx: CanvasRenderingContext2D
 export let container: Container
 
-/** This class produces a singleton Container object named (_instance).    
+/** 
+ * This class produces a singleton Container object named (_instance).    
  * This _instance object is exported as 'container' to the app.    
  *     
  * Container is our top level View object.    
@@ -29,12 +36,14 @@ export class Container {
     x: number
     y: number
 
-    /** a private instance of the Container class.
+    /** 
+     * a private instance of the Container class.
      * Exposed only by the Container.init() method
      */
     private static _instance: Container
 
-    /** Container singleton initialization.
+    /** 
+     * Container singleton initialization.
      * Called from DOMContentLoaded event handler (app.js)
      * @param canvas {HTMLCanvasElement} Canvas dependency injection
      * @param color {string} the background color of the canvas
@@ -54,7 +63,9 @@ export class Container {
         initHandlers()
     }
 
-    /** private Container constructor for singleton instance */
+    /** 
+     * private Container constructor for singleton instance 
+     */
     private constructor(canvas: HTMLCanvasElement, color: string) {
 
         this.color = color
@@ -129,7 +140,8 @@ export class Container {
         surface.parentElement.removeChild(surface)
     }
 
-    /** Initialize and return a canvasContext2D object for this HTMLCanvasElement
+    /** 
+     * Initialize and return a canvasContext2D object for this HTMLCanvasElement
      * @param canvas {HTMLCanvasElement} the canvas element
      * @param color {string} an initial color for both stroke and fill styles
      */
@@ -149,7 +161,9 @@ export class Container {
         return ctx
     }
 
-    /** Clears the canvas to its background color */
+    /** 
+     * Clears the canvas to its background color 
+     * */
     clearCanvas(buffer?: any) {
         if (buffer) {
             const _a: number = 0 //CAN-DO-- fill with buffer
@@ -159,7 +173,9 @@ export class Container {
         }
     }
 
-    /** Adjusts the Position of the canvas */
+    /** 
+     * Adjusts the Position of the canvas 
+     * */
     setPosition(x: number, y: number) {
         this.x = x
         this.canvas.style.left = x + 'px'

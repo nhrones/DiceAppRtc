@@ -112,9 +112,6 @@ export const onSignalRecieved = (topic: number, listener: Function) => {
  *	@param {object} data - the data object to send
  */
  export const sendSignal = (topic: message, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {   
-    //TODO fix this to send two params instead of an object
-    //const msg = JSON.stringify( { topic: topic, data: data } )
-    //const msg = JSON.stringify( [ topic, data ] )
     const msg = JSON.stringify( [ topic, data ] )
     if (webRTC.dataChannel && webRTC.dataChannel.readyState === 'open') {
         if (DEBUG) console.log('broadcast on DataChannel:', msg)
@@ -127,43 +124,22 @@ export const onSignalRecieved = (topic: number, listener: Function) => {
     }
 }
 
-/** exported socket event message list */
-// export const message = {
-//     /* game events */
-//     RegisterPlayer: 'RegisterPlayer', // socket.js:69
-//     RemovePlayer: 'RemovePlayer', // players.js:
-//     ResetGame: 'ResetGame', // diceGame.js:30
-//     ResetTurn: 'ResetTurn', // diceGame.js:24
-//     ShowPopup: 'ShowPopup', // popup.js:30
-//     UpdateRoll: 'UpdateRoll', // rollButton.js:13
-//     UpdateScore: 'UpdateScore', // scoreElement.js:31
-//     UpdateDie: 'UpdateDie', // dice.js:32
-//     UpdatePlayers: 'UpdatePlayers', // players.js:17
-//     SetID: "SetID", // app.js:5
-//     GameFull: "GameFull", // app.js 29
-
-//     /* WebRTC events*/
-//     Bye: 'bye',
-//     RtcOffer: 'RtcOffer',
-//     RtcAnswer: 'RtcAnswer',
-//     IceCandidate: 'candidate',
-//     ConnectOffer: 'connectOffer'
-// }
-
-/** exported socket event message list */
+/** signal event message list */
 export enum message {
+    
     /* game events */
-    RegisterPlayer,
-    RemovePlayer,
-    ResetGame,
-    ResetTurn,
-    ShowPopup,
-    UpdateRoll,
-    UpdateScore,
-    UpdateDie,
-    UpdatePlayers,
-    SetID,
-    GameFull,
+    RegisterPlayer, // socket.js:69
+    RemovePlayer, // players.js:
+    ResetGame, // diceGame.js:30
+    ResetTurn, // diceGame.js:24
+    ShowPopup, // popup.js:30
+    UpdateRoll, // rollButton.js:13
+    UpdateScore, // scoreElement.js:31
+    UpdateDie, // dice.js:32
+    UpdatePlayers, // players.js:17
+    SetID, // app.js:5
+    GameFull, // app.js 29
+    
     /* WebRTC events*/
     Bye,
     RtcOffer,

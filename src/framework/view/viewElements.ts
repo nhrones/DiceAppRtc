@@ -4,8 +4,8 @@
 //  ViewElements ... a collection of 'View' objects.                                  \\
 //  ViewElement objects are used to persist renderable objects to the 'canvas'.       \\
 //                                                                                    \\
-//  ViewElements are held in an ES6 Map.                                              \\
-//  This map maintains a sort-order based on an ViewElements zOrder number.           \\
+//  ViewElements are held in an ES6 Set.                                              \\
+//  This Set maintains a sort-order based on an ViewElements zOrder number.           \\
 //  This insures proper rendering order, as well as, ordered 'hit-testing'            \\
 //  by using each elements Path2D path.                                               \\
 //  We hit-test 'front-to-back' to insure that top-level elements are detected first. \\
@@ -29,7 +29,7 @@ export const add = (view: View) => {
 
     // is this an 'active-view' (has a hovered property?)
     if (!("undefined" === typeof (view["hovered"]))) {
-        // add all active-views(views that are clickable) to activeNodes collection
+        // add an active-view(a view that is `clickable`) to the collection
         activeNodes.add(view as View)
     }
 

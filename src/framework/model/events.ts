@@ -3,7 +3,7 @@ const topicSubscriptions: Map<string, Function[]> = new Map()
 
 /**
  *  registers a callback function to be executed when a topic is published
- *	e.g.: Events.when(topic.GameOver, Game.resetGame)
+ *	@example ON(Event.GameOver, Game.resetGame)
  *   .. returns an object containing a 'remove' function
  *	@param topic {string} the topic of interest
  *	@param callback {function} a callback function
@@ -19,7 +19,6 @@ export const ON = (topic: string, callback: Function): { remove: any } => {
  *  registers a callback function to be executed when a topic is published
  *	@param topic {string} the topic of interest
  *	@param callback {function} a callback function
- *	@param once {boolean} if true ... fire once then unregister
  *	@return remove {object} returns an object containing a 'remove' function
  */
 const _registerListener = (topic: string, callback: Function) => {
@@ -28,11 +27,8 @@ const _registerListener = (topic: string, callback: Function) => {
         topicSubscriptions.set(topic, [])
     }
     const subscriptions = topicSubscriptions.get(topic)!
-
     const index = subscriptions.length
-
     subscriptions.push(callback)
-
 
     // return an anonomous object with a 'remove' function
     return {
@@ -47,7 +43,7 @@ const _registerListener = (topic: string, callback: Function) => {
 
 /** 
  *  fires an event for a topic with optional data
- *	e.g.: Events.fireEvent("GameOver", winner)
+ *	@example Fire(Event.UpdateDie, value)
  *	@param {string} topic - the topic of interest
  *	@param {object} data - optional data to report to subscribers
  */

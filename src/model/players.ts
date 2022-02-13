@@ -1,7 +1,6 @@
 
 import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
-import { RTCopen } from './../framework/model/webRTC.js'
-import { ON, Event, Fire } from '../framework/model/events.js'
+import { Event, Fire } from '../framework/model/events.js'
 import { Player, DEBUG } from '../types.js'
 import { DiceGame } from './diceGame.js'
 
@@ -14,7 +13,8 @@ export const players: Set<Player> = new Set();
 export const init = (thisgame: DiceGame, color: string) => {
     game = thisgame
     thisColor = color
-    /** player 'state' objects */
+    
+    // player 'state' objects 
     players.clear()
 
     thisPlayer = {
@@ -76,14 +76,18 @@ export const init = (thisgame: DiceGame, color: string) => {
     })
 }
 
-/** resets all players labels */
+/** 
+ * resets all players labels 
+ */
 export const resetScoreLabels = () => {
     for (let i = 0; i < MAXPLAYERS; i++) {
         updatePlayer(i, thisColor, '')
     }
 }
 
-/** reset players state to initial game state */
+/** 
+ * reset players state to initial game state 
+ */
 export const resetPlayers = () => {
     for (const player of players) {
         player.score = 0
@@ -91,14 +95,18 @@ export const resetPlayers = () => {
     }
 }
 
-/** add a score value for this player */
+/** 
+ * add a score value for this player 
+ */
 export const addScore = (player: Player, value: number) => {
     player.score += value
     const text = (player.score === 0) ? player.playerName : `${player.playerName} = ${player.score}`
     updatePlayer(player.idx, player.color, text)
 }
 
-/** broadcast an update message to the view element */
+/** 
+ * broadcast an update message to the view element 
+ */
 const updatePlayer = (index: number, color: string, text: string) => {
     Fire(`${Event.UpdateLabel}player${index}`,
         {
@@ -108,10 +116,8 @@ const updatePlayer = (index: number, color: string, text: string) => {
     )
 }
 
-
-/////////////////////    from server    ////////////////////////
-
-/** add a new player,  
+/** 
+ * add a new player,  
  * broadcasts `UpdatePlayers` (will ResetGame) 
  * @param {string} id - the id of the new player
  */
@@ -145,7 +151,8 @@ export const addPlayer = (id: string, playerName: string) => {
 
 }
 
-/** removes a Player    
+/** 
+ * removes a Player    
  * called when the players webSocket has closed    
  * @param {string} id - the id of the player to be removed
  */
@@ -174,7 +181,9 @@ export const getNextPlayer = (player: Player) => {
     return [...players][next]
 }
 
-/** reassigns index and unique color for each active player */
+/** 
+ * reassigns index and unique color for each active player 
+ */
 const refreshPlayerColors = () => {
     let i = 0
     for (const player of players) {
@@ -183,9 +192,11 @@ const refreshPlayerColors = () => {
         i++
     }
 }
-//}
 
-/** an array of player colors */
+
+/** 
+ * an array of player colors 
+ */
 const playerColors = ["Brown", "Green", "RoyalBlue", "Red"]
 
 
@@ -199,7 +210,7 @@ export const setThisPlayer = (player: Player) => {
 export let thisPlayer: Player = {
     id: "0",
     idx: 0,
-    playerName: 'Nick',
+    playerName: 'Player1',
     color: 'brown',
     score: 0,
     lastScore: ''
@@ -208,7 +219,7 @@ export let thisPlayer: Player = {
 export let currentPlayer: Player = {
     id: "0",
     idx: 0,
-    playerName: "Nick",
+    playerName: "Player1",
     color: 'brown',
     score: 0,
     lastScore: ''

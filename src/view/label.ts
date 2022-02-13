@@ -5,7 +5,9 @@ import { container, ctx } from './container.js'
 
 
 
-/** A virtual Label view class */
+/** 
+ * A virtual Label view class 
+ */
 export default class Label implements View {
 
     id: number = 0 // assigned by activeViews.add()
@@ -26,7 +28,9 @@ export default class Label implements View {
     text: string
     lastText: string
     
-    /** ctor that instantiates a new vitual Label view */
+    /** 
+     * constructor that instantiates a new vitual Label view 
+     */
     constructor(index: number, name: string, text: string, geometry: Geometry,
         fillColor: string, bind: boolean) {
         this.name = name
@@ -70,12 +74,16 @@ export default class Label implements View {
         }
     }
 
-    /** updates and renders the view */
+    /** 
+     * updates and renders the view 
+     */
     update() {
         this.render()
     }
 
-    /** render this Label shape (path) onto the canvas */
+    /** 
+     * render this Label shape (path) onto the canvas 
+     */
     render() {
         ctx.fillStyle = this.fillColor
         ctx.fillRect(this.textLeft, this.textTop, this.geometry.width, this.geometry.height)

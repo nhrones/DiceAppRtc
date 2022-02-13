@@ -5,7 +5,7 @@ import { getStyles } from './styles.js'
 export const components: ElementDescriptor[] = []
 let component: ElementDescriptor | null = null
 
-/** Builds a set of IElementDescriptors by examining the loaded   
+/** Builds a set of ElementDescriptors by examining the loaded   
  * HTML document, and CSS stylesheets.  
  * Called from DOMContentLoaded event handler (app.js)    
  */

@@ -18,7 +18,7 @@ if (thisHost === 'localhost' || thisHost === '127.0.0.1') {
 
 
 // Once we connect with the server, it will return its 
-// request.headers('sec-websocket-key') as a new client 'ID'
+// request.headers('sec-websocket-key') as our new peer 'ID'
 onSignalRecieved(message.SetID, (data:{id: string, role: number}) => {
     console.info('message.SetID: data = ', data)
     //     const name = prompt(`
@@ -45,7 +45,7 @@ onSignalRecieved(message.SetID, (data:{id: string, role: number}) => {
     if (game) { game.resetGame() }
 })
 
-// issue a new client 'ID'
+// sorry game full
 onSignalRecieved(message.GameFull, () => {
     const msg = `Sorry, This game is already full!
 This tab/window will automatically close!`

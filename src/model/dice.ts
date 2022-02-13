@@ -5,12 +5,12 @@ import * as evaluator from './diceEvaluator.js'
 import { game } from './diceGame.js'
 import {Die} from '../types.js'
 
-/** Singleton Dice class.    
- * Represents a set of Die.    
- * A diceGame can have only a single set of dice. */
+/**   
+ * This module represents a singleton set of Die.    
+ * A diceGame can have only a single set of dice. 
+ */
 
 export let rollCount = 0
-//const dieSize = 72
 export let isFiveOfaKind = false
 export let fiveOfaKindCount = 0
 export let fiveOfaKindBonusAllowed = false
@@ -60,13 +60,12 @@ export const init = () => {
             updateView(index, thisDie.value, thisDie.frozen)
             PlaySound.Select()
             // inform all other players
-            //hack socket.broadcast({topic: socket.topic.UpdateDie, data:{ dieNumber: index, AppID: thisPlayer.id }})
             sendSignal(message.UpdateDie, { dieNumber: index})
         }
     })
 
-    // register a callback function for the webSocket.UpdateDie event
-    // when other player touched their die ...
+    // register a callback function for the UpdateDie signalling event
+    // sent when other player touched their die ...
     onSignalRecieved(message.UpdateDie, (data: { dieNumber: number }) => {
         const targetDie = die[data.dieNumber]
         if (targetDie.value > 0) {

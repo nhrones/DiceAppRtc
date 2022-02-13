@@ -6,7 +6,8 @@ import * as dice from './dice.js'
 const kind = 'rollbutton'
 export const state = { text: '', color: '', enabled: true }
 
-/** RollButton viewModel initialization
+/** 
+ *  RollButton viewModel initialization    
  *  Called from DiceGame ctor
 */
 export const init = () => {
@@ -25,7 +26,9 @@ export const init = () => {
 
 }
 
-/** state management for the roll button */
+/** 
+ * state management for the roll button 
+ */
 const updateRollState = () => {
     switch (dice.rollCount) {
         case 1:
@@ -45,7 +48,9 @@ const updateRollState = () => {
     update()
 }
 
-/** fires an update event with the current state */
+/** 
+ * fires an update event with the current state 
+ */
 export const update = () => {
     Fire(Event.UpdateButton + kind, state)
 }

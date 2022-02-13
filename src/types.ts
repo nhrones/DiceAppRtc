@@ -10,12 +10,17 @@ export const ICEconfiguration = {
     }]
 }
 
-/** SignallingMessage type */
+/** 
+ * SignallingMessage type 
+ */
 export type SignallingMessage = { 
     topic: number, 
     data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string[] | string, 
 }
-/** ScoringMessage type */
+
+/** 
+ * ScoringMessage type 
+ */
 export type ScoringMessage = { 
     index: number,
     owner: number, 
@@ -29,7 +34,9 @@ export type Die = {
     frozen: boolean
 }
 
-/** View interface */
+/** 
+ * View interface 
+ */
 export interface View {
     activeView: boolean
     index: number
@@ -47,8 +54,9 @@ export interface View {
     touched(): void
 }
 
-/** a type used to contain the values    
- * required to build an `ActiveView` object 
+/** 
+ * a type used to contain the values required    
+ * to build (hydrate) an `ActiveView` object 
  */
 export type ElementDescriptor = {
     kind: string
@@ -58,8 +66,9 @@ export type ElementDescriptor = {
     renderAttributes: RenderAttributes
 }
 
-/** a type used to contain a set of optional attributes   
- * that are used to configure a rendering context   
+/** 
+ * A type used to contain a set of optional rendering attributes.   
+ * These are used to configure a rendering context   
  * strokeColor, fillColor, fontColor, fontSize, borderWidth, text
  */
 export type RenderAttributes = {
@@ -72,8 +81,9 @@ export type RenderAttributes = {
     isLeft?: boolean
 }
 
-/** a type that prescribes the geometry used   
- * to locate and size a Path2D object      
+/** 
+ * A type that prescribes the geometry used   
+ * to locate and size a Path2D object.      
  * (used to render and hit-test a unique shape on a canvas)
  */
 export type Geometry = {
@@ -84,7 +94,9 @@ export type Geometry = {
     radius?: number
 }
 
-/** a type that describes a Player onject */
+/** 
+ * A type that describes a Player object. 
+ */
 export type Player = {
     id: string
     idx: number
@@ -94,6 +106,9 @@ export type Player = {
     lastScore: string
 }
 
+/** 
+ * A type that describes the state of a label object. 
+ */
 export const LabelState = {
     Normal: 0,
     Hovered: 1,

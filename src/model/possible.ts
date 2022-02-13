@@ -11,12 +11,15 @@ const House: number = 10
 const FiveOfaKind: number = 11
 const Chance: number = 12
 
-/** A module that evaluates a possible score for 
- * each ScoreElement based on the current values 
- * of the dice set 
- */
+//
+// A module that evaluates a possible score for 
+// each ScoreElement based on the current values 
+// of the dice set 
+//
 
-/** the index value of the Five of a kind scoreElement */
+/** 
+ * the index value of the Five of a kind scoreElement 
+ */
 export const FiveOfaKindIndex: number = FiveOfaKind
 
 /** 

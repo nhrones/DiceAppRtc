@@ -6,7 +6,6 @@ import  * as socket  from '../framework/model/signalling.js'
 
 /*  aliases  */
 const { message } = socket
-
 import {  
     ON, 
     Event,  
@@ -16,7 +15,9 @@ import {
 let left = 1
 let top = 1
 
-/** A virtual Popup view class */
+/** 
+ * A virtual Popup view class 
+ */
 export default class Popup implements View {
 
     id: number = 0 // assigned by activeViews.add() 
@@ -36,7 +37,9 @@ export default class Popup implements View {
     visible: boolean = true
     buffer: ImageData | null = null
 
-    /** ctor that instantiates a new vitual Popup view */
+    /** 
+     * constructor that instantiates a new vitual Popup view 
+     */
     constructor(geometry: Geometry, path: Path2D) {
 
         this.enabled = true
@@ -51,8 +54,8 @@ export default class Popup implements View {
 
 
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-        //                         bind events                     \\
-        ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        //                         bind events                    \\
+        ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         // Our model broadcasts this ShowPopup event at the end of a game
         ON(Event.ShowPopup, (data: { message: string }) => {
@@ -69,7 +72,9 @@ export default class Popup implements View {
         })
     }
 
-    /** show the virtual Popup view */
+    /** 
+     * show the virtual Popup view 
+     */
     show(msg: string) {
         this.text = msg
         left = this.geometry.left
@@ -81,7 +86,9 @@ export default class Popup implements View {
         this.render()
     }
 
-    /** hide the virtual Popup view */
+    /** 
+     * hide the virtual Popup view 
+     */
     hide() {
         if (this.visible) {
             left = 1
@@ -93,19 +100,25 @@ export default class Popup implements View {
         }
     }
 
-    /** takes a snapshot of our current canvas bitmap */
+    /** 
+     * takes a snapshot of our current canvas bitmap 
+     */
     saveScreenToBuffer() {
         this.buffer = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
     }
 
-    /** paint the canvas with our current snapshot */
+    /** 
+     * paint the canvas with our current snapshot 
+     */
     restoreScreenFromBuffer() {
         if (this.buffer) {
             return ctx.putImageData(this.buffer, 0, 0)
         }
     }
 
-    /** called by the view container when this element has been touched */
+    /** 
+     * called by the view container when this element has been touched 
+     */
     touched() {
         this.hide()
         Fire(Event.PopupResetGame, {})
@@ -115,7 +128,9 @@ export default class Popup implements View {
         if (this.visible) this.render()
     }
 
-    /** render this virtual Popup view */
+    /** 
+     * render this virtual Popup view 
+     */
     render() {
         ctx.save()
         ctx.shadowColor = '#404040'

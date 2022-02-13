@@ -22,7 +22,6 @@ const grayColor = 'gray'
 ///////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 export let game: DiceGame
-//export let dice: Dice
 
 /** the main view-model for the dice game */
 export class DiceGame {
@@ -34,7 +33,6 @@ export class DiceGame {
     fiveOkindBonus: number
     leftTotal: number
     rightTotal: number
-    //rollButton: RollButton
 
     /** DiceGame private instance, exposed by init() */
     private static _instance: DiceGame
@@ -58,10 +56,8 @@ export class DiceGame {
         this.fiveOkindBonus = 0
         this.leftTotal = 0
         this.rightTotal = 0
-        //dice = Dice.init()
         dice.init()
         rollButton.init()
-        //Possible.init()
 
         ///////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
         //                       bind events                          \\
@@ -131,13 +127,12 @@ export class DiceGame {
         }
     }
 
-    /** resets the turn by resetting values and state */
+    /** 
+     * resets the turn by resetting values and state 
+     */
     resetTurn() {
-        //const { rollButton } = this
-        //setCurrentPlayer(this.playerManager.getNextPlayer(currentPlayer))
         Players.setCurrentPlayer(Players.getNextPlayer(Players.currentPlayer))
         PlaySound.enabled(Players.currentPlayer.id === Players.thisPlayer.id)
-
         rollButton.state.color = Players.currentPlayer.color
         rollButton.state.enabled = true
         rollButton.state.text = 'Roll Dice'
@@ -148,7 +143,9 @@ export class DiceGame {
         this.setRightScores()
     }
 
-    /** resets game state to start a new game */
+    /** 
+     * resets game state to start a new game 
+     */
     resetGame() {
         document.title = Players.thisPlayer.playerName
         Fire(Event.HidePopup, {})
@@ -158,7 +155,6 @@ export class DiceGame {
             scoreItem.reset()
         }
         // clear the view
-        //this.playerManager.resetScoreLabels()
         Players.resetScoreLabels()
         this.leftBonus = 0
         this.fiveOkindBonus = 0
@@ -174,7 +170,9 @@ export class DiceGame {
         rollButton.update()
     }
  
-    /** show a popup with winner and final score */
+    /** 
+     * show a popup with winner and final score 
+     */
     showFinalScore(winner: any) {
         let winMsg
         if (winner.id !== Players.thisPlayer.id) {
@@ -199,7 +197,9 @@ export class DiceGame {
         )
     }
 
-    /** check all scoreElements to see if game is complete */
+    /** 
+     * check all scoreElements to see if game is complete 
+     */
     isGameComplete() {
         let result = true
         for (const scoreItem of this.scoreItems) {
@@ -210,7 +210,9 @@ export class DiceGame {
         return result
     }
 
-    /** sum and show left scoreElements total value */
+    /** 
+     * sum and show left scoreElements total value 
+     */
     setLeftScores() {
         this.leftTotal = 0
         for (const player of this.players) {
@@ -272,7 +274,9 @@ export class DiceGame {
         }
     }
 
-    /** sum the values of the right scoreElements */
+    /** 
+     * sum the values of the right scoreElements 
+     */
     setRightScores() {
         let val
         const len = this.scoreItems.length

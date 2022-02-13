@@ -19,8 +19,10 @@ const emptyString: string = ''
 const black = 'black'
 const infolabel = 'infolabel'
 const snow = 'snow'
-const UpdateScoreMsg = 60
-/** ScoreElement viewModel class */
+
+/** 
+ * ScoreElement viewModel class 
+ */
 export default class ScoreElement {
 
     available: boolean
@@ -34,7 +36,9 @@ export default class ScoreElement {
     scoringDiesetSum: number
     hasFiveOfaKind: boolean = false
     updateScoreMsg: number
-    /** constructor ... called from DiceGame.buildScoreItems()
+    
+    /** 
+     * constructor ... called from DiceGame.buildScoreItems()
      * @param dice {Dice} Dice dependency injection
      * @param index {number} index of this instance
      * @param name {string} the name of this instance
@@ -53,6 +57,7 @@ export default class ScoreElement {
         ///////////////////////////////////////////////    
         //               bind events                 //
         /////////////////////////////////////////////// 
+        
         // when I select a score
         ON(`${Event.ScoreButtonTouched}${this.index}`, () => {
             // notify all other players
@@ -68,6 +73,7 @@ export default class ScoreElement {
             this.clicked()
         })
 
+        // show a message at bottom of screen when a user hovers on this element
         ON(Event.UpdateTooltip + this.index, (data: { hovered: boolean }) => {
 
             let msg = ''
@@ -103,14 +109,18 @@ export default class ScoreElement {
         })
     }
 
-    /** broadcasts a message used to update the bottom infolabel element */
+    /** 
+     * broadcasts a message used to update the bottom infolabel element 
+     */
     updateInfo(text: string) {
         Fire(Event.UpdateLabel + infolabel,
             { state: 0, color: snow, textColor: black, text: text }
         )
     }
 
-    /** sets a flag to indicate this score is owned by the current player */
+    /** 
+     * sets a flag to indicate this score is owned by the current player 
+     */
     setOwned(value: boolean) {
         this.owned = value
         if (this.owned) {
@@ -123,7 +133,9 @@ export default class ScoreElement {
         }
     }
 
-    /** fires event used to update the score value */
+    /** 
+     * fires event used to update the score value 
+     */
     renderValue(value: string) {
         Fire(Event.UpdateScoreElement + this.index,
             {
@@ -135,7 +147,9 @@ export default class ScoreElement {
         )
     }
 
-    /**  broadcasts a message used to update the score view element */
+    /**  
+     * broadcasts a message used to update the score view element 
+     */
     updateScoreElement(color: string | null, value: string) {
         Fire(Event.UpdateScoreElement + this.index,
             {
@@ -147,8 +161,10 @@ export default class ScoreElement {
         )
     }
 
-    /** sets a flag that determins if this scoreElement is available   
-     * to be selected by the current player */
+    /** 
+     * sets a flag that determins if this scoreElement is available   
+     * to be selected by the current player 
+     */
     setAvailable(value: boolean) {
         this.available = value
         if (this.available) {
@@ -164,9 +180,11 @@ export default class ScoreElement {
         }
     }
 
-    /** the clicked event handler for this scoreElement.    
+    /** 
+     * the clicked event handler for this scoreElement.    
      * returns true if the click caused this score to be    
-     * taken by the current player  */
+     * taken by the current player  
+     */
     clicked() {
 
         // if game has not started ... just return
@@ -211,7 +229,9 @@ export default class ScoreElement {
         return scoreTaken
     }
 
-    /** sets the value of this scoreElement after taken by a player */
+    /** 
+     * sets the value of this scoreElement after taken by a player 
+     */
     setValue() {
         //TODO SET transaction result here?
         this.setOwned(true)
@@ -247,7 +267,9 @@ export default class ScoreElement {
         }
     }
 
-    // evaluates and displays a possible value for this scoreElement
+    /**  
+     * evaluates and displays a possible value for this scoreElement
+     */
     setPossible() {
         this.possibleValue = Possible.evaluate(this.index)
         if (!this.owned) {
@@ -284,7 +306,9 @@ export default class ScoreElement {
     }
 
 
-    /** resets this scoreElement */
+    /** 
+     * resets this scoreElement 
+     */
     reset() {
         this.setOwned(false)
         this.finalValue = 0
@@ -293,7 +317,9 @@ export default class ScoreElement {
         this.hasFiveOfaKind = false
     }
 
-    /** clears the possible value for this scoreElement */
+    /** 
+     * clears the possible value for this scoreElement 
+     */
     clearPossible() {
         this.possibleValue = 0
         this.setAvailable(false)
