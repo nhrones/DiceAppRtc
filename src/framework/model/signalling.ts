@@ -70,7 +70,7 @@ export const initialize = (serverURL: string) => {
 /** 
  * Notify the server ... we're registering as a new player    
  * called from app.ts line# 15 
- * */
+ */
 export const registerPlayer = (id: string, name: string) => {
     // At this point, we don't know our peer.
     // Since we're registering, we wait for a 'PlayerUpdate' response
@@ -81,7 +81,7 @@ export const registerPlayer = (id: string, name: string) => {
 /** 
  * Dispatches a message event to all registered listeners with optional data     
  * Called from both `socket.onmessage` and from WebRTC.`dataChannel.onmessage`. 	  
- * @example dispatch( "GameOver", winner )    
+ * @example dispatch( message.ResetTurn, {currentPlayerIndex: 1} )    
  * @param topic {string} the topic of interest
  * @param data {string | object} optional data to report to subscribers
  */
