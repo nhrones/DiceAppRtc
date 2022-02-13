@@ -5,7 +5,9 @@ import { dispatch } from './signalling.js'
 
 export let peerConnection: RTCPeerConnection;
 
-/** The RTCDataChannel API enables peer-to-peer exchange of data */
+/** 
+ * The RTCDataChannel API enables peer-to-peer exchange of data 
+ */
 export let dataChannel: RTCDataChannel;
 export let RTCopen = false
 
@@ -72,19 +74,25 @@ export const initialize = () => {
         makeConnection();
     })
 }
-/** Start the peerConnection process by signalling an invitation */
+
+/** 
+ * Start the peerConnection process by signalling an invitation 
+ */
 export const start = () => {
     sendSignal(message.invitation, {} );
 }
 
-/** Resets the peerConnection and dataChannel, then calls 'start()' */
+/** 
+ * Resets the peerConnection and dataChannel, then calls 'start()' 
+ */
 const reset = () => {
     dataChannel = null
     peerConnection = null
     start()
 }
 
-/** creates a peer connection 
+/** 
+ * creates a peer connection 
  * @param {boolean} - isOfferer - we're making the offer     
  *   true when called by makeConnection() - we are sending an offer    
  *   false when called from signaller.when('RtcOffer') - someone else sent us an offer
