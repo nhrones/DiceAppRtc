@@ -71,11 +71,11 @@ export const initialize = (serverURL: string) => {
  * Notify the server ... we're registering as a new player    
  * called from app.ts line# 15 
  */
-export const registerPlayer = (id: string, name: string) => {
+ export const registerPlayer = (id: string, name: string, role: number) => {
     // At this point, we don't know our peer.
     // Since we're registering, we wait for a 'PlayerUpdate' response
     // from the  player that currently has 'focus'
-    sendSignal(message.RegisterPlayer,[id, name])
+    sendSignal(message.RegisterPlayer,{id: id, name: name, role: role})
 }
 
 /** 

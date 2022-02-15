@@ -164,6 +164,7 @@ function checkDataChannelState() {
         RTCopen = true
         updateUI({ content: `Player1 is now connected to Player2`, clearContent: true });
     } else if (dataChannel.readyState === 'closed') {
+        
         updateUI({
             content: `Player2 was disconnected! 
 Waiting for new offer on: ${location.origin}`, clearContent: true

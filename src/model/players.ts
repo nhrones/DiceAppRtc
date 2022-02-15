@@ -3,6 +3,7 @@ import { onSignalRecieved, message, sendSignal } from '../framework/model/signal
 import { Event, Fire } from '../framework/model/events.js'
 import { Player, DEBUG } from '../types.js'
 import { DiceGame } from './diceGame.js'
+import * as gameState from '../gameState.js'
 
 const MAXPLAYERS = 2
 
@@ -26,10 +27,11 @@ export const init = (thisgame: DiceGame, color: string) => {
         lastScore: ''
     }
  
-    onSignalRecieved(message.RegisterPlayer, (player: string[]) => {
+    onSignalRecieved(message.RegisterPlayer, (player: any) => {
         if (DEBUG) console.info('RegisterPlayer: ', player)
-        const id = player[0]
-        const name = player[1]
+        const {id, name, role} = player
+        gameState.manageState('connect', id, name, role) 
+        console.log('Recieved.RegisterPlayer - state:', gameState.toString())
         if (DEBUG) console.log(`WS.RegisterPlayer ${id}  ${name}`)
         addPlayer(id, name);
         setCurrentPlayer([...players][0]);
@@ -68,8 +70,9 @@ export const init = (thisgame: DiceGame, color: string) => {
 
     onSignalRecieved(message.RemovePlayer, (id: string) => {
         //if (!RTCopen) { //TODO fix this
-            removePlayer(id)
-            game.resetGame()
+        gameState.manageState('disconnect', id, '', 0)
+        removePlayer(id)
+        game.resetGame()
         //} else {
         //    alert('Socket-Server-Closed!')
         //}
