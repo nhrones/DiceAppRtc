@@ -82,8 +82,8 @@ export const initialize = () => {
  * Start the peerConnection process by signalling an invitation 
  */
 export const start = () => {
-    //TODO restart the signaller then wait for an invite
-    //sendSignal(message.invitation, {} );
+    // restart the signaller then wait for an invite
+    sendSignal(message.invitation, {} );
 }
 
 /** 
@@ -163,8 +163,6 @@ function setupDataChannel() {
 function checkDataChannelState() {
     if (dataChannel.readyState === 'open') {
         RTCopen = true
-        //TODO disconnect socket! No longer needed.
-        disconnect()
         updateUI({ content: `Player1 is now connected to Player2`, clearContent: true });
     } else if (dataChannel.readyState === 'closed') {
         updateUI({
