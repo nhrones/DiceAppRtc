@@ -1,5 +1,5 @@
 
-import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
+import { onSignalRecieved, message, sendSignal } from '../framework/comms/signalling.js'
 import { Event, Fire } from '../framework/model/events.js'
 import { Player, DEBUG } from '../types.js'
 import { DiceGame } from './diceGame.js'
@@ -29,8 +29,8 @@ export const init = (thisgame: DiceGame, color: string) => {
  
     onSignalRecieved(message.RegisterPlayer, (player: any) => {
         if (DEBUG) console.info('RegisterPlayer: ', player)
-        const {id, name, role} = player
-        gameState.manageState('connect', id, name, role) 
+        const {id, name, table, seat} = player
+        gameState.manageState('connect', id, name, table, seat) 
         console.log('Recieved.RegisterPlayer - state:', gameState.toString())
         if (DEBUG) console.log(`WS.RegisterPlayer ${id}  ${name}`)
         addPlayer(id, name);
@@ -70,7 +70,7 @@ export const init = (thisgame: DiceGame, color: string) => {
 
     onSignalRecieved(message.RemovePlayer, (id: string) => {
         //if (!RTCopen) { //TODO fix this
-        gameState.manageState('disconnect', id, '', 0)
+        gameState.manageState('disconnect', id, '', 0, 0)
         removePlayer(id)
         game.resetGame()
         //} else {
@@ -146,9 +146,8 @@ export const addPlayer = (id: string, playerName: string) => {
                 lastScore: ''
             }
         )
-
         // don't update if we're just registering
-        // WS.broadcast("UpdatePlayers", Array.from(this.players.values()))
+        //WS.broadcast("UpdatePlayers", Array.from(this.players.values()))
     }
     if (DEBUG) console.info(' added player', Array.from(players.values()))
 

@@ -1,10 +1,10 @@
 
-import { onSignalRecieved, message, sendSignal } from './signalling.js'
+import { onSignalRecieved, message, sendSignal, disconnect } from './signalling.js'
 import { DEBUG } from '../../types.js'
 import { dispatch } from './signalling.js'
 
 export let peerConnection: RTCPeerConnection;
-
+ 
 /** 
  * The RTCDataChannel API enables peer-to-peer exchange of data 
  */
@@ -82,7 +82,8 @@ export const initialize = () => {
  * Start the peerConnection process by signalling an invitation 
  */
 export const start = () => {
-    sendSignal(message.invitation, {} );
+    //TODO restart the signaller then wait for an invite
+    //sendSignal(message.invitation, {} );
 }
 
 /** 
@@ -162,9 +163,10 @@ function setupDataChannel() {
 function checkDataChannelState() {
     if (dataChannel.readyState === 'open') {
         RTCopen = true
+        //TODO disconnect socket! No longer needed.
+        disconnect()
         updateUI({ content: `Player1 is now connected to Player2`, clearContent: true });
     } else if (dataChannel.readyState === 'closed') {
-        
         updateUI({
             content: `Player2 was disconnected! 
 Waiting for new offer on: ${location.origin}`, clearContent: true

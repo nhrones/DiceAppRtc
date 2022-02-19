@@ -1,10 +1,10 @@
- 
-import { Event, Fire } from './events.js'
+
+import { Event, Fire } from '../model/events.js'
 import * as webRTC from './webRTC.js'
 import { DEBUG, SignallingMessage } from '../../types.js'
 
 /** 
- * Each Map-entry holds an array of callback functions mapped to a topic name 
+ * Each Map-entry holds an array of callback functions mapped to a topic ID 
  */
 const subscriptions = new Map<number, Function[]>()
 
@@ -27,13 +27,14 @@ export const initialize = (serverURL: string) => {
     if (socket) { return }
 
     // close the socket when the window closes
-    window.onbeforeunload = () => {
+    //window.onbeforeunload = () => {
+    window.addEventListener('beforeunload', () => {
         if (socket) {
             // disable onclose handler first
             socket.onclose = function () { };
-            socket.close()
+            socket.close(1001, 'Client tab closed!')
         }
-    };
+    })
 
     // instantiate a new WebSocket listener
     socket = new WebSocket(serverURL)
@@ -67,15 +68,23 @@ export const initialize = (serverURL: string) => {
     })
 }
 
+/**
+ * disconnect
+ */
+export const disconnect = () => {
+    console.log('Disconnecting socket')
+    socket.close(1000, 'WebRtc connected! No longer needed!')
+}
+
 /** 
  * Notify the server ... we're registering as a new player    
  * called from app.ts line# 15 
  */
- export const registerPlayer = (id: string, name: string, role: number) => {
+export const registerPlayer = (id: string, name: string, table: number, seat: number) => {
     // At this point, we don't know our peer.
     // Since we're registering, we wait for a 'PlayerUpdate' response
     // from the  player that currently has 'focus'
-    sendSignal(message.RegisterPlayer,{id: id, name: name, role: role})
+    sendSignal(message.RegisterPlayer, { id: id, name: name, table: table, seat: seat })
 }
 
 /** 
@@ -86,7 +95,7 @@ export const initialize = (serverURL: string) => {
  * @param(string | object) - data - optional data to report to subscribers
  */
 export const dispatch = (topic: message, data: string | string[] | object) => {
-    
+
     if (subscriptions.has(topic)) {
         const subs = subscriptions.get(topic)!
         if (subs) {
@@ -116,8 +125,8 @@ export const onSignalRecieved = (topic: number, listener: Function) => {
  *	@param(string) topic - the topic of interest
  *	@param(object) data - the data object to send
  */
- export const sendSignal = (topic: message, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {   
-    const msg = JSON.stringify( [ topic, data ] )
+export const sendSignal = (topic: message, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {
+    const msg = JSON.stringify([topic, data])
     if (webRTC.dataChannel && webRTC.dataChannel.readyState === 'open') {
         if (DEBUG) console.log('broadcast on DataChannel:', msg)
         webRTC.dataChannel.send(msg)
@@ -133,7 +142,7 @@ export const onSignalRecieved = (topic: number, listener: Function) => {
  * signal event message list 
  */
 export enum message {
-    
+
     /* game events */
     RegisterPlayer, // socket.js:69
     RemovePlayer, // players.js:
@@ -146,7 +155,7 @@ export enum message {
     UpdatePlayers, // players.js:17
     SetID, // app.js:5
     GameFull, // app.js 29
-    
+
     /* WebRTC events*/
     Bye,
     RtcOffer,

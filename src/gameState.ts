@@ -1,31 +1,33 @@
 export const emptyString = ''
 type action = 'connect' | 'disconnect'
 export let id = emptyString
-export let callee = {id: emptyString, name: 'Player1'}
-export let caller = {id: emptyString, name: 'Player2'}
+export let seat1 = {id: emptyString, table: 0, name: 'Player1'} // callee
+export let seat2 = {id: emptyString, table: 0, name: 'Player2'} // caller
 
-export const gameFull = () => callee.id !== emptyString && caller.id !== emptyString
+export const gameFull = () => seat1.id !== emptyString && seat2.id !== emptyString
 
-export const manageState = (action: action, id: string, name: string, role: number) => {
+export const manageState = (action: action, id: string, name: string, table: number, seat: number) => {
+    
     if (action === 'connect') {
-        if (callee.id === emptyString) {
-            callee.id = id
-            callee.name = name
-        } else if (caller.id === emptyString) {
-            caller.id = id
-            caller.name = name
+        if (seat1.id === emptyString) {
+            seat1.id = id
+            seat1.name = name
+        } else if (seat2.id === emptyString) {
+            seat2.id = id
+            seat2.name = name
         }
-    } else if (action === 'disconnect') {
-        if (callee.id === id) {
-            callee.id = emptyString
-            callee.name = emptyString
-        } else if (caller.id === id) {
-            caller.id = emptyString
-            caller.name = emptyString
+    } 
+    else if (action === 'disconnect') {
+        if (seat1.id === id) {
+            seat1.id = emptyString
+            seat1.name = emptyString
+        } else if (seat2.id === id) {
+            seat2.id = emptyString
+            seat2.name = emptyString
         }
     }
 }
 
 export const toString = () => {
-    return `Callee: ${callee} Caller: ${caller}`
+    return `Seat1: ${seat1} Seat2: ${seat2}`
 }

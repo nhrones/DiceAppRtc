@@ -1,4 +1,4 @@
-import { onSignalRecieved, message, sendSignal } from '../framework/model/signalling.js'
+import { onSignalRecieved, message, sendSignal } from '../framework/comms/signalling.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
 import * as PlaySound from '../framework/model/sounds.js'
 import * as evaluator from './diceEvaluator.js'

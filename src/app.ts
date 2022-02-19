@@ -1,7 +1,7 @@
 
 import { DiceGame, game } from './model/diceGame.js';
 import { Container, container } from './view/container.js'
-import * as socket from './framework/model/signalling.js';
+import * as socket from './framework/comms/signalling.js';
 import * as Players from './model/players.js';
 import * as gameState from './gameState.js'
 
@@ -20,13 +20,13 @@ if (thisHost === 'localhost' || thisHost === '127.0.0.1') {
 
 
 // Once we connect with the server, it will return our new peer 'ID'
-onSignalRecieved(message.SetID, (data:{id: string, role: number}) => {
-    console.info('message.SetID: data = ', data)
+onSignalRecieved(message.SetID, (data: { id: string, table: number, seat: number}) => {
+    console.info('--------------------------------message.SetID: data = ', data)
     //     const name = prompt(`
     // Please enter your name or just
     // press enter to accept 'Player'`, "Player") || 'Player';
-    let name = 'Player'+ data.role
-    gameState.manageState('connect', data.id, name, data.role)
+    let name = 'Player'+ data.seat
+    gameState.manageState('connect', data.id, name, data.table, data.seat)
     console.log('Game state:', gameState.toString())
     Players.thisPlayer.id = data.id
     Players.thisPlayer.playerName =  name
@@ -34,7 +34,7 @@ onSignalRecieved(message.SetID, (data:{id: string, role: number}) => {
     Players.setCurrentPlayer(Players.thisPlayer)
     // now that we have a unique ID, 
     // we'll register our self with all other peers
-    registerPlayer(data.id, name, data.role)
+    registerPlayer(data.id, name, data.table, data.seat)
     Players.addPlayer(data.id, name)
     if (game) { game.resetGame() }
 })
