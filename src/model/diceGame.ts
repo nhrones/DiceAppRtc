@@ -1,5 +1,5 @@
 
-import { onSignalRecieved, message, sendSignal } from '../framework/comms/signalling.js';
+import { onSignalRecieved, message, sendSignal } from '../framework/comms/signaling.js';
 import { ON, Event, Fire } from '../framework/model/events.js'
 import * as Players from '../model/players.js'
 import { Player } from '../types.js'

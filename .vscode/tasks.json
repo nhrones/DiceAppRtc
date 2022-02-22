@@ -61,6 +61,7 @@
                 "cwd": "../RtcSignalServer",
                 "env": {
                     "DEBUG": "true", 
+                    "MAX_CONNECTS": "2", 
                     "DENO_REGION" : "localhost"
                 },
             },
@@ -76,7 +77,8 @@
                 "options": {
                     "cwd": "../RtcSignalServer",
                     "env": {
-                        "DEBUG": "true", 
+                        "DEBUG": "true",
+                        "MAX_CONNECTS": "2", 
                         "DENO_REGION" : "localhost"
                     },
                 },

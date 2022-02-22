@@ -1,4 +1,4 @@
-import { onSignalRecieved, message, sendSignal } from '../framework/comms/signalling.js'
+import { onSignalRecieved, message, sendSignal } from '../framework/comms/signaling.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
 import * as PlaySound from '../framework/model/sounds.js'
 import * as evaluator from './diceEvaluator.js'
@@ -66,7 +66,7 @@ export const init = () => {
         }
     })
 
-    // register a callback function for the UpdateDie signalling event
+    // register a callback function for the UpdateDie signaling event
     // sent when other player touched their die ...
     onSignalRecieved(message.UpdateDie, (data: { dieNumber: number }) => {
         const targetDie = die[data.dieNumber]

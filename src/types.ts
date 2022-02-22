@@ -11,9 +11,9 @@ export const ICEconfiguration = {
 }
 
 /** 
- * SignallingMessage type 
+ * SignalingMessage type 
  */
-export type SignallingMessage = { 
+export type SignalingMessage = { 
     topic: number, 
     data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string[] | string, 
 }

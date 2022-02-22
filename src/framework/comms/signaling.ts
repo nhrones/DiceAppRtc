@@ -1,7 +1,7 @@
 
 import { Event, Fire } from '../model/events.js'
 import * as webRTC from './webRTC.js'
-import { DEBUG, SignallingMessage } from '../../types.js'
+import { DEBUG, SignalingMessage } from '../../types.js'
 
 /** 
  * Each Map-entry holds an array of callback functions mapped to a topic ID 
@@ -11,7 +11,7 @@ const subscriptions = new Map<number, Function[]>()
 /**
  * array of scoring transactions
  */
-const transactions: SignallingMessage[] = []
+const transactions: SignalingMessage[] = []
 
 /** 
  * this clients WebSocket connection to the server 
@@ -40,7 +40,7 @@ export const initialize = (serverURL: string) => {
     socket = new WebSocket(serverURL)
 
     socket.onopen = () => {
-        if (DEBUG) console.log('signalling.socket.opened!');
+        if (DEBUG) console.log('signaling.socket.opened!');
         webRTC.initialize()
         webRTC.start()
     }
@@ -77,14 +77,15 @@ export const disconnect = () => {
 }
 
 /** 
- * Notify the server ... we're registering as a new player    
+ * Notify any listening peers ... we're registering as a new player    
  * called from app.ts line# 15 
  */
 export const registerPlayer = (id: string, name: string, table: number, seat: number) => {
     // At this point, we don't know our peer.
-    // Since we're registering, we wait for a 'PlayerUpdate' response
-    // from the  player that currently has 'focus'
-    sendSignal(message.RegisterPlayer, { id: id, name: name, table: table, seat: seat })
+    // Since we're registering, we'll expect to recieve a 'PlayerUpdate' response
+    //TODO send direct and unconditional to the signal-server
+    socket.send(JSON.stringify([message.RegisterPlayer, { id: id, name: name, table: table, seat: seat }]))
+    //sendSignal(message.RegisterPlayer, { id: id, name: name, table: table, seat: seat })
 }
 
 /** 
@@ -95,7 +96,6 @@ export const registerPlayer = (id: string, name: string, table: number, seat: nu
  * @param(string | object) - data - optional data to report to subscribers
  */
 export const dispatch = (topic: message, data: string | string[] | object) => {
-
     if (subscriptions.has(topic)) {
         const subs = subscriptions.get(topic)!
         if (subs) {
@@ -125,16 +125,20 @@ export const onSignalRecieved = (topic: number, listener: Function) => {
  *	@param(string) topic - the topic of interest
  *	@param(object) data - the data object to send
  */
-export const sendSignal = (topic: message, data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {
+export const sendSignal = (
+    topic: message | webRTC.message,
+    data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string) => {
     const msg = JSON.stringify([topic, data])
     if (webRTC.dataChannel && webRTC.dataChannel.readyState === 'open') {
-        if (DEBUG) console.log('broadcast on DataChannel:', msg)
+        if (DEBUG) console.log('DataChannel >> :', msg)
         webRTC.dataChannel.send(msg)
-    } else if (socket) {
-        if (DEBUG) console.log('broadcast on WebSocket:', msg)
+    } else if (socket.readyState === WebSocket.OPEN) {
+        //todo don't send unnessary messages if 
+        // only one player (solitare)
+        if (DEBUG) console.log('socket >> :', msg)
         socket.send(msg)
     } else {
-        if (DEBUG) console.error('No place to send:', msg)
+        console.error('No place to send:', msg)
     }
 }
 
@@ -142,24 +146,15 @@ export const sendSignal = (topic: message, data: RTCSessionDescriptionInit | RTC
  * signal event message list 
  */
 export enum message {
-
-    /* game events */
-    RegisterPlayer, // socket.js:69
-    RemovePlayer, // players.js:
-    ResetGame, // diceGame.js:30
-    ResetTurn, // diceGame.js:24
-    ShowPopup, // popup.js:30
-    UpdateRoll, // rollButton.js:13
-    UpdateScore, // scoreElement.js:31
-    UpdateDie, // dice.js:32
-    UpdatePlayers, // players.js:17
-    SetID, // app.js:5
-    GameFull, // app.js 29
-
-    /* WebRTC events*/
-    Bye,
-    RtcOffer,
-    RtcAnswer,
-    candidate,
-    invitation
+    RegisterPlayer = 0, // signaling: 86, players: 33
+    RemovePlayer = 1,   // players: 76, server::signaler: 80
+    ResetGame = 2,      // diceGame: 72, 78
+    ResetTurn = 3,      // diceGame: 66, scoreElement: 66
+    ShowPopup = 4,      // diceGame: 195, popup : 66
+    UpdateRoll = 5,     // rollButton: 17, 22
+    UpdateScore = 6,    // webRTC: 160, scoreElement: 64
+    UpdateDie = 7,      // dice: 65, 71
+    UpdatePlayers = 8,  // players: 41, 45
+    SetID = 9,          // app: 22
+    GameFull = 10,      // app: 29
 }

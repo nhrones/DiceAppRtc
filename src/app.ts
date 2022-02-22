@@ -1,10 +1,10 @@
 
 import { DiceGame, game } from './model/diceGame.js';
 import { Container, container } from './view/container.js'
-import * as socket from './framework/comms/signalling.js';
+import * as socket from './framework/comms/signaling.js';
 import * as Players from './model/players.js';
-import * as gameState from './gameState.js'
-
+import { gameState } from './gameState.js'
+import { Event, Fire } from './framework/model/events.js'
 import { DEBUG } from './types.js'
 
 const { onSignalRecieved, registerPlayer, message } = socket
@@ -18,18 +18,16 @@ if (thisHost === 'localhost' || thisHost === '127.0.0.1') {
     socket.initialize('wss://rtc-signal-server.deno.dev')
 }
 
-
 // Once we connect with the server, it will return our new peer 'ID'
-onSignalRecieved(message.SetID, (data: { id: string, table: number, seat: number}) => {
-    console.info('--------------------------------message.SetID: data = ', data)
+onSignalRecieved(message.SetID, (data: { id: string, table: number, seat: number }) => {
     //     const name = prompt(`
     // Please enter your name or just
     // press enter to accept 'Player'`, "Player") || 'Player';
-    let name = 'Player'+ data.seat
-    gameState.manageState('connect', data.id, name, data.table, data.seat)
+    let name = 'Player' + data.seat
+    gameState.connect(data.id, name, data.table, data.seat)
     console.log('Game state:', gameState.toString())
     Players.thisPlayer.id = data.id
-    Players.thisPlayer.playerName =  name
+    Players.thisPlayer.playerName = name
     Players.setThisPlayer(Players.thisPlayer)
     Players.setCurrentPlayer(Players.thisPlayer)
     // now that we have a unique ID, 
@@ -37,12 +35,14 @@ onSignalRecieved(message.SetID, (data: { id: string, table: number, seat: number
     registerPlayer(data.id, name, data.table, data.seat)
     Players.addPlayer(data.id, name)
     if (game) { game.resetGame() }
+
 })
 
 // sorry game full
 onSignalRecieved(message.GameFull, () => {
-    const msg = `Sorry, This game is already full!
-This tab/window will automatically close!`
+    const msg = `Sorry! This game is full!
+Please close the tab/window! 
+Try again in a minute or two!`
     if (DEBUG) console.log(msg)
     alert(msg);
 

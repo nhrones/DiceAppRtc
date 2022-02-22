@@ -1,16 +1,18 @@
 
-import { onSignalRecieved, message, sendSignal } from '../framework/comms/signalling.js'
+import { onSignalRecieved, message, sendSignal } from '../framework/comms/signaling.js'
 import { Event, Fire } from '../framework/model/events.js'
 import { Player, DEBUG } from '../types.js'
 import { DiceGame } from './diceGame.js'
-import * as gameState from '../gameState.js'
+import { gameState } from '../gameState.js'
 
 const MAXPLAYERS = 2
 
 let game: DiceGame;
 let thisColor: string = 'snow';
 export const players: Set<Player> = new Set();
-
+export const getCount =() => {
+    return players.size;
+}
 export const init = (thisgame: DiceGame, color: string) => {
     game = thisgame
     thisColor = color
@@ -27,11 +29,11 @@ export const init = (thisgame: DiceGame, color: string) => {
         lastScore: ''
     }
  
+    //HACK Can only be Player2 as Player1 is set internally onSetID in app.ts
     onSignalRecieved(message.RegisterPlayer, (player: any) => {
         if (DEBUG) console.info('RegisterPlayer: ', player)
         const {id, name, table, seat} = player
-        gameState.manageState('connect', id, name, table, seat) 
-        console.log('Recieved.RegisterPlayer - state:', gameState.toString())
+        gameState.connect(id, name, table, seat) 
         if (DEBUG) console.log(`WS.RegisterPlayer ${id}  ${name}`)
         addPlayer(id, name);
         setCurrentPlayer([...players][0]);
@@ -68,9 +70,12 @@ export const init = (thisgame: DiceGame, color: string) => {
         game.resetGame()
     })
 
+    //
+    //  sent from server on socket.close()
+    //
     onSignalRecieved(message.RemovePlayer, (id: string) => {
         //if (!RTCopen) { //TODO fix this
-        gameState.manageState('disconnect', id, '', 0, 0)
+        gameState.disconnect(id, '', 0, 0)
         removePlayer(id)
         game.resetGame()
         //} else {
@@ -146,8 +151,6 @@ export const addPlayer = (id: string, playerName: string) => {
                 lastScore: ''
             }
         )
-        // don't update if we're just registering
-        //WS.broadcast("UpdatePlayers", Array.from(this.players.values()))
     }
     if (DEBUG) console.info(' added player', Array.from(players.values()))
 
@@ -160,8 +163,9 @@ export const addPlayer = (id: string, playerName: string) => {
  */
 const removePlayer = (id: string) => {
     const p = getById(id)
+    if(p === null) return
     if (DEBUG) console.info(' removing player', p)
-    if (p) players.delete(p)
+    players.delete(p)
     refreshPlayerColors();
     setThisPlayer([...players][0])
 }

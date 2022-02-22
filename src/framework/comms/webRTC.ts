@@ -1,10 +1,10 @@
 
-import { onSignalRecieved, message, sendSignal, disconnect } from './signalling.js'
+import { onSignalRecieved, sendSignal } from './signaling.js'
 import { DEBUG } from '../../types.js'
-import { dispatch } from './signalling.js'
+import { dispatch } from './signaling.js'
 
 export let peerConnection: RTCPeerConnection;
- 
+
 /** 
  * The RTCDataChannel API enables peer-to-peer exchange of data 
  */
@@ -12,7 +12,7 @@ export let dataChannel: RTCDataChannel;
 export let RTCopen = false
 
 /**
- * initialize a WebRtc signalling session
+ * initialize a WebRtc signaling session
  */
 export const initialize = () => {
 
@@ -79,11 +79,11 @@ export const initialize = () => {
 }
 
 /** 
- * Start the peerConnection process by signalling an invitation 
+ * Start the peerConnection process by signaling an invitation 
  */
 export const start = () => {
-    // restart the signaller then wait for an invite
-    sendSignal(message.invitation, {} );
+    // restart the signaler then wait for an invite
+    sendSignal(message.invitation, {});
 }
 
 /** 
@@ -99,7 +99,7 @@ const reset = () => {
  * creates a peer connection 
  * @param(boolean) isOfferer - are we making the offer?     
  *   true when called by makeConnection() - we are sending an offer    
- *   false when called from signaller.when('RtcOffer') - someone else sent us an offer
+ *   false when called from signaler.when('RtcOffer') - someone else sent us an offer
  */
 function createPeerConnection(isOfferer: boolean) {
     if (DEBUG) console.log('Starting WebRTC as', isOfferer ? 'Offerer' : 'Offeree');
@@ -125,7 +125,7 @@ function createPeerConnection(isOfferer: boolean) {
             init.sdpMid = event.candidate.sdpMid;
             init.sdpMLineIndex = event.candidate.sdpMLineIndex;
         }
-        // sent over the signaller to the remote peer.
+        // sent over the signaler to the remote peer.
         sendSignal(message.candidate, init);
     };
 
@@ -151,6 +151,9 @@ function setupDataChannel() {
     checkDataChannelState();
     dataChannel.onopen = checkDataChannelState;
     dataChannel.onclose = checkDataChannelState;
+    
+    // NOTE: dataChannel and signaler both call signaler.dispatch
+    // as game-state events can come from either
     dataChannel.addEventListener("message", (event: { data: string }) => {
         const payload = JSON.parse(event.data)
         const topic = payload[0]
@@ -161,17 +164,19 @@ function setupDataChannel() {
 }
 
 function checkDataChannelState() {
-    if (dataChannel.readyState === 'open') {
-        RTCopen = true
-        updateUI({ content: `Player1 is now connected to Player2`, clearContent: true });
-    } else if (dataChannel.readyState === 'closed') {
-        updateUI({
-            content: `Player2 was disconnected! 
-Waiting for new offer on: ${location.origin}`, clearContent: true
-        });
-        RTCopen = false
-        // reset everything and restart
-        reset()
+    if (dataChannel.readyState === ReadyState.open) {
+        if (RTCopen === false) {
+            RTCopen = true
+            updateUI({ content: `Player1 is now connected to Player2`, clearContent: true });
+        }
+    } else if (dataChannel.readyState === ReadyState.closed) {
+        if (RTCopen === true) {
+            RTCopen = false
+            updateUI({
+                content: `Player2 was disconnected! Waiting for new offer on: ${location.origin}`, clearContent: true});
+            // reset everything and restart
+            reset()
+        }
     }
 }
 
@@ -190,4 +195,22 @@ updateUI({ content: `Player1 is waiting for a connection from: ${location.origin
 //todo do-UI, use popup?
 function updateUI(msg: { content: string, clearContent?: boolean }) {
     if (DEBUG) console.log(msg.content)
+}
+
+export const ReadyState = {
+    closed: 'closed',
+    closing: 'closing',
+    connecting: 'connecting',
+    open: 'open',
+}
+
+/** 
+ * WebRTC signal eventlist 
+ */
+ export enum message {
+    Bye = 11,
+    RtcOffer = 12,
+    RtcAnswer = 13,
+    candidate = 14,
+    invitation = 15
 }

@@ -2,7 +2,7 @@
 import {} from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
-import  * as socket  from '../framework/comms/signalling.js'
+import  * as socket  from '../framework/comms/signaling.js'
 
 /*  aliases  */
 const { message } = socket
