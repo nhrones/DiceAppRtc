@@ -1,5 +1,4 @@
 
-
 const DNA = {
     channelID: 0,   // channel-ID number - high-byte of id
     memberID: 0,    // member-ID  number - low-byte  of id

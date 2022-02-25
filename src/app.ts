@@ -4,7 +4,6 @@ import { Container, container } from './view/container.js'
 import * as socket from './framework/comms/signaling.js';
 import * as Players from './model/players.js';
 import { gameState } from './gameState.js'
-import { Event, Fire } from './framework/model/events.js'
 import { DEBUG } from './types.js'
 
 const { onSignalRecieved, registerPlayer, message } = socket

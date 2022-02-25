@@ -1,4 +1,3 @@
-
 import { Event, Fire } from '../model/events.js'
 import * as webRTC from './webRTC.js'
 import { DEBUG, SignalingMessage } from '../../types.js'
