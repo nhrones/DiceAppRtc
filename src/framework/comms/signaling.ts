@@ -1,7 +1,7 @@
 import { SignalingMessage, sigMessage, rtcMessage } from '../../types.js'
 import { Event, Fire } from '../model/events.js'
 import * as webRTC from './webRTC.js'
-import { DEBUG, SSEReadyState } from '../../constants.js'
+import { DEBUG, SSEReadyState, SignalServer } from '../../constants.js'
 import * as Players from '../../model/players.js'
 import { game } from '../../model/diceGame.js';
 
@@ -44,7 +44,7 @@ export const initialize = (name: string, id: string) => {
      * ReadableStream through the body property of 
      * a Response object.
     */
-    sse = new EventSource('http://localhost:8000/listen/' + id)
+    sse = new EventSource(SignalServer +'/listen/' + id)
 
     sse.onopen = () => {
         if (DEBUG) console.log('Sse.onOpen! >>>  webRTC.start()');
@@ -148,7 +148,7 @@ export const registerPlayer = (id: string, name: string) => {
     }
     const msg = JSON.stringify(regObj)
     console.log('Step-6 - POST registeringPlayer >>> ', msg)
-    fetch("http://localhost:8000/send", {
+    fetch(SignalServer, {
         method: "POST",
         body: msg
     })
@@ -203,7 +203,7 @@ export const sendSignal = (msg: SignalingMessage) => {
         //if (msg.topic > 7) {
         const sigMsg = JSON.stringify({ from: thisID, topic: msg.topic, data: msg.data })
         if (DEBUG) console.log('Sending to sig-server >>> :', sigMsg)
-        fetch("http://localhost:8000/send", {
+        fetch(SignalServer, {
             method: "POST",
             body: sigMsg
         })
