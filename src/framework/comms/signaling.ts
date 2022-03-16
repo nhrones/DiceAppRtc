@@ -7,8 +7,13 @@ import { game } from '../../model/diceGame.js';
 
 
 export let thisID = 'Player1'
+//const proto = (window.location.protocol === 'http:') ? 'ws://' : 'wss://';
+const host = window.location.host 
+const SignalServerURL = (host === '127.0.0.1' || host === 'localhost') 
+    ? 'http://localhost:8000'
+    : SignalServer
 
-
+console.log('SignalServerURL',SignalServerURL)
 
 /** 
  * Each Map-entry holds an array of callback functions mapped to a topic ID 
@@ -44,7 +49,7 @@ export const initialize = (name: string, id: string) => {
      * ReadableStream through the body property of 
      * a Response object.
     */
-    sse = new EventSource(SignalServer +'/listen/' + id)
+    sse = new EventSource(SignalServerURL +'/listen/' + id)
 
     sse.onopen = () => {
         if (DEBUG) console.log('Sse.onOpen! >>>  webRTC.start()');
@@ -148,7 +153,7 @@ export const registerPlayer = (id: string, name: string) => {
     }
     const msg = JSON.stringify(regObj)
     console.log('Step-6 - POST registeringPlayer >>> ', msg)
-    fetch(SignalServer, {
+    fetch(SignalServerURL, {
         method: "POST",
         body: msg
     })
@@ -199,15 +204,12 @@ export const sendSignal = (msg: SignalingMessage) => {
         if (DEBUG) console.info('Sending to DataChannel >> :', webRTCmsg)
         webRTC.dataChannel.send(webRTCmsg)
     } else if (sse.readyState === SSEReadyState.OPEN) {
-        // only send WebRtc negotiation messages as we're still alone
-        //if (msg.topic > 7) {
         const sigMsg = JSON.stringify({ from: thisID, topic: msg.topic, data: msg.data })
         if (DEBUG) console.log('Sending to sig-server >>> :', sigMsg)
-        fetch(SignalServer, {
+        fetch(SignalServerURL, {
             method: "POST",
             body: sigMsg
         })
-        //}
     } else {
         console.error('No place to send the message:', msg.topic)
     }
