@@ -1,8 +1,9 @@
 
-import { onSignalRecieved, sendSignal } from './signaling.js'
-import { DEBUG } from '../../types.js'
-import { dispatch } from './signaling.js'
-
+import { Player, rtcMessage, sigMessage } from '../../types.js'
+import { dispatch, onSignalRecieved, sendSignal } from './signaling.js'
+import { DEBUG } from '../../constants.js'
+import { Event, Fire } from '../model/events.js'
+import {players, removePlayer} from '../../model/players.js'
 export let peerConnection: RTCPeerConnection;
 
 /** 
@@ -18,7 +19,9 @@ export const initialize = () => {
 
     // handle a Session-Description-Offer 
     // param {RTCSessionDescriptionInit} offer - {topic: string, sdp: string}
-    onSignalRecieved(message.RtcOffer, async (offer: RTCSessionDescriptionInit) => {
+    onSignalRecieved(rtcMessage.RtcOffer, async (offer: RTCSessionDescriptionInit) => {
+        
+        console.info('offer: ', offer)
         if (peerConnection) {
             if (DEBUG) console.error('existing peerconnection');
             return;
@@ -26,7 +29,7 @@ export const initialize = () => {
         createPeerConnection(false);
         await peerConnection.setRemoteDescription(offer);
         const answer = await peerConnection.createAnswer();
-        sendSignal(message.RtcAnswer, { type: 'answer', sdp: answer.sdp });
+        sendSignal({topic:rtcMessage.RtcAnswer, data:{ type: 'answer', sdp: answer.sdp }});
 
         // Note that RTCPeerConnection won't start gathering 
         // candidates until setLocalDescription() is called.
@@ -35,7 +38,7 @@ export const initialize = () => {
 
     // handle a Session-Description-Answer 
     // @param(RTCSessionDescriptionInit) answer - {type: string, sdp: string}
-    onSignalRecieved(message.RtcAnswer, async (answer: RTCSessionDescriptionInit) => {
+    onSignalRecieved(rtcMessage.RtcAnswer, async (answer: RTCSessionDescriptionInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
             return;
@@ -45,7 +48,7 @@ export const initialize = () => {
 
     // handle ICE-Candidate
     // param(RTCIceCandidateInit) candidate - RTCIceCandidateInit
-    onSignalRecieved(message.candidate, async (candidate: RTCIceCandidateInit) => {
+    onSignalRecieved(rtcMessage.candidate, async (candidate: RTCIceCandidateInit) => {
         if (!peerConnection) {
             if (DEBUG) console.error('no peerconnection');
             return;
@@ -57,7 +60,7 @@ export const initialize = () => {
         }
     })
 
-    onSignalRecieved(message.Bye, () => {
+    onSignalRecieved(rtcMessage.Bye, () => {
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null
@@ -65,7 +68,7 @@ export const initialize = () => {
     })
 
     // A peer is offering to connect
-    onSignalRecieved(message.invitation, (_data: any) => {
+    onSignalRecieved(rtcMessage.invitation, (_data: any) => {
         // I'll initiate an RTC-connection 
         // unless I'm engaged already.
         if (peerConnection) {
@@ -83,16 +86,18 @@ export const initialize = () => {
  */
 export const start = () => {
     // restart the signaler then wait for an invite
-    sendSignal(message.invitation, {});
-}
+    sendSignal({topic:rtcMessage.invitation, data:{}});
+} 
 
 /** 
  * Resets the peerConnection and dataChannel, and calls 'start()' 
  */
-const reset = () => {
+const reset = (msg: string) => {
     dataChannel = null
     peerConnection = null
     start()
+    removePlayer([...players][1].id)
+    Fire(Event.ShowPopup, { message: msg })
 }
 
 /** 
@@ -126,7 +131,7 @@ function createPeerConnection(isOfferer: boolean) {
             init.sdpMLineIndex = event.candidate.sdpMLineIndex;
         }
         // sent over the signaler to the remote peer.
-        sendSignal(message.candidate, init);
+        sendSignal({topic:rtcMessage.candidate, data:init});
     };
 
     // creating data channel 
@@ -154,13 +159,13 @@ function setupDataChannel() {
     
     // NOTE: dataChannel and signaler both call signaler.dispatch
     // as game-state events can come from either
-    dataChannel.addEventListener("message", (event: { data: string }) => {
-        const payload = JSON.parse(event.data)
-        const topic = payload[0]
-        const tName = (topic > 59) ? 'UpdateScore' : message[topic]
+    dataChannel.onmessage = (event: MessageEvent<any>) => { 
+        const msg = JSON.parse(event.data)
+        const {topic, data} = msg
+        const tName = (topic > 59) ? 'UpdateScore' : (topic < 10) ? sigMessage[topic] : rtcMessage[topic]
         if (DEBUG) console.info('DataChannel recieved topic: ', tName)
-        dispatch(topic, payload[1])
-    })
+        dispatch(topic, data)
+    }
 }
 
 function checkDataChannelState() {
@@ -172,10 +177,8 @@ function checkDataChannelState() {
     } else if (dataChannel.readyState === ReadyState.closed) {
         if (RTCopen === true) {
             RTCopen = false
-            updateUI({
-                content: `Player2 was disconnected! Waiting for new offer on: ${location.origin}`, clearContent: true});
             // reset everything and restart
-            reset()
+            reset('Player2 has disconnected!')
         }
     }
 }
@@ -183,7 +186,7 @@ function checkDataChannelState() {
 export async function makeConnection() {
     createPeerConnection(true);
     const offer = await peerConnection.createOffer();
-    sendSignal(message.RtcOffer, { type: 'offer', sdp: offer.sdp });
+    sendSignal({topic: rtcMessage.RtcOffer, data: { type: 'offer', sdp: offer.sdp }});
     // Note that RTCPeerConnection won't start gathering 
     // candidates until setLocalDescription() is called.
     await peerConnection.setLocalDescription(offer);
@@ -202,15 +205,4 @@ export const ReadyState = {
     closing: 'closing',
     connecting: 'connecting',
     open: 'open',
-}
-
-/** 
- * WebRTC signal eventlist 
- */
- export enum message {
-    Bye = 11,
-    RtcOffer = 12,
-    RtcAnswer = 13,
-    candidate = 14,
-    invitation = 15
 }

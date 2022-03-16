@@ -1,5 +1,5 @@
-
-import { onSignalRecieved, message, sendSignal } from '../framework/comms/signaling.js';
+import { sigMessage } from '../types.js'
+import { onSignalRecieved, sendSignal } from '../framework/comms/signaling.js';
 import { ON, Event, Fire } from '../framework/model/events.js'
 import * as Players from '../model/players.js'
 import { Player } from '../types.js'
@@ -63,19 +63,19 @@ export class DiceGame {
         //                       bind events                          \\
         ///////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-        onSignalRecieved(message.ResetTurn, (_data: {}) => {
+        onSignalRecieved(sigMessage.ResetTurn, (_data: {}) => {
             if (!this.isGameComplete()) {
                 this.resetTurn()
             }
         })
 
-        onSignalRecieved(message.ResetGame, (data: {}) => {
+        onSignalRecieved(sigMessage.ResetGame, (data: {}) => {
             this.resetGame()
         })
 
 
         ON(Event.PopupResetGame, () => {
-            sendSignal(message.ResetGame, {})
+            sendSignal({topic: sigMessage.ResetGame, data:{}})
             this.resetGame()
         })
 
@@ -192,8 +192,8 @@ export class DiceGame {
         Fire(Event.ShowPopup,
             {message: winMsg + ' ' + winner.score }
         )
-        sendSignal(message.ShowPopup,
-            {message: winner.playerName + ' wins!' + ' ' + winner.score }
+        sendSignal({topic: sigMessage.ShowPopup,
+            data: {message: winner.playerName + ' wins!' + ' ' + winner.score }}
         )
     }
 

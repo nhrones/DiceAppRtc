@@ -1,5 +1,5 @@
-
-import { onSignalRecieved, message, sendSignal } from '../framework/comms/signaling.js'
+import { sigMessage } from '../types.js'
+import { onSignalRecieved, sendSignal } from '../framework/comms/signaling.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
 import { Player } from '../types.js'
 import { currentPlayer, thisPlayer } from './players.js'
@@ -61,9 +61,9 @@ export default class ScoreElement {
         // when I select a score
         ON(`${Event.ScoreButtonTouched}${this.index}`, () => {
             // notify all other players
-            sendSignal(this.updateScoreMsg, "")
+            sendSignal({topic: this.updateScoreMsg, data:""})
             if (this.clicked()) {
-                sendSignal(message.ResetTurn, "")
+                sendSignal({topic: sigMessage.ResetTurn, data:""})
                 Fire(Event.ScoreElementResetTurn, "")
             }
         })

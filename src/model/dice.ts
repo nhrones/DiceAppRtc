@@ -1,4 +1,5 @@
-import { onSignalRecieved, message, sendSignal } from '../framework/comms/signaling.js'
+import { sigMessage } from '../types.js'
+import { onSignalRecieved, sendSignal } from '../framework/comms/signaling.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
 import * as PlaySound from '../framework/model/sounds.js'
 import * as evaluator from './diceEvaluator.js'
@@ -62,13 +63,13 @@ export const init = () => {
             updateView(index, thisDie.value, thisDie.frozen)
             PlaySound.Select()
             // inform all other players
-            sendSignal(message.UpdateDie, { dieNumber: index})
+            sendSignal({topic: sigMessage.UpdateDie, data:{ dieNumber: index}})
         }
     })
 
     // register a callback function for the UpdateDie signaling event
     // sent when other player touched their die ...
-    onSignalRecieved(message.UpdateDie, (data: { dieNumber: number }) => {
+    onSignalRecieved(sigMessage.UpdateDie, (data: { dieNumber: number }) => {
         const targetDie = die[data.dieNumber]
         if (targetDie.value > 0) {
             targetDie.frozen = !targetDie.frozen

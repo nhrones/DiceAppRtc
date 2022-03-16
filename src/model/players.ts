@@ -1,9 +1,9 @@
-
-import { onSignalRecieved, message, sendSignal } from '../framework/comms/signaling.js'
+import { sigMessage } from '../types.js'
+import { onSignalRecieved, sendSignal } from '../framework/comms/signaling.js'
 import { Event, Fire } from '../framework/model/events.js'
-import { Player, DEBUG } from '../types.js'
+import { Player } from '../types.js'
+import { DEBUG } from '../constants.js'
 import { DiceGame } from './diceGame.js'
-import { gameState } from '../gameState.js'
 
 const MAXPLAYERS = 2
 
@@ -30,19 +30,19 @@ export const init = (thisgame: DiceGame, color: string) => {
     }
  
     //HACK Can only be Player2 as Player1 is set internally onSetID in app.ts
-    onSignalRecieved(message.RegisterPlayer, (player: any) => {
-        if (DEBUG) console.info('RegisterPlayer: ', player)
-        const {id, name, table, seat} = player
-        gameState.connect(id, name, table, seat) 
-        if (DEBUG) console.log(`WS.RegisterPlayer ${id}  ${name}`)
+    onSignalRecieved(sigMessage.RegisterPlayer, (player: {id: string, name: string}) => {
+        if (DEBUG) console.info('@@@@@@@@@@@@@@@@@@@@@@@Players Got RegisterPlayer: @@@@@@@@@@@@@@@@@', (typeof player))
+        console.log('playerid: ', player.id)
+        const {id, name} = player
+        if (DEBUG) console.log(`Players.RegisterPlayer ${id}  ${name}`)
         addPlayer(id, name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
-        sendSignal(message.UpdatePlayers, Array.from(players.values()))
+        sendSignal({topic: sigMessage.UpdatePlayers, data: Array.from(players.values())})
     })
 
     // will only come from focused-player (currentPlayer)
-    onSignalRecieved(message.UpdatePlayers, (playersArray: Player[]) => {
+    onSignalRecieved(sigMessage.UpdatePlayers, (playersArray: Player[]) => {
         // clear the players set
         players.clear()
 
@@ -73,14 +73,9 @@ export const init = (thisgame: DiceGame, color: string) => {
     //
     //  sent from server on socket.close()
     //
-    onSignalRecieved(message.RemovePlayer, (id: string) => {
-        //if (!RTCopen) { //TODO fix this
-        gameState.disconnect(id, '', 0, 0)
+    onSignalRecieved(sigMessage.RemovePlayer, (id: string) => {
         removePlayer(id)
         game.resetGame()
-        //} else {
-        //    alert('Socket-Server-Closed!')
-        //}
     })
 }
 
@@ -161,13 +156,14 @@ export const addPlayer = (id: string, playerName: string) => {
  * called when the players webSocket has closed    
  * @param(string) id - the id of the player to be removed
  */
-const removePlayer = (id: string) => {
+export const removePlayer = (id: string) => {
     const p = getById(id)
     if(p === null) return
     if (DEBUG) console.info(' removing player', p)
     players.delete(p)
     refreshPlayerColors();
     setThisPlayer([...players][0])
+    setCurrentPlayer([...players][0])
 }
 
 const getById = (id: string): Player | null => {
@@ -207,6 +203,7 @@ const playerColors = ["Brown", "Green", "RoyalBlue", "Red"]
 
 
 export const setThisPlayer = (player: Player) => {
+    if (DEBUG) console.log(`Step-4 - Players.setThisPlayer: ${player.playerName}`)
     const favicon = document.getElementById("favicon") as HTMLLinkElement
     thisPlayer = player
     document.title = thisPlayer.playerName
@@ -232,6 +229,7 @@ export let currentPlayer: Player = {
 }
 
 export const setCurrentPlayer = (player: Player) => {
-    if (DEBUG) console.log(`settingCurrentPlayer: ${player.playerName}`)
+
+    if (DEBUG) console.log(`Step-5 - Players.settingCurrentPlayer: ${player.playerName}`)
     currentPlayer = player
 }

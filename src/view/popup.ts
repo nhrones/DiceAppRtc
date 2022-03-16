@@ -3,9 +3,8 @@ import {} from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import  * as socket  from '../framework/comms/signaling.js'
+import { sigMessage } from '../types.js'
 
-/*  aliases  */
-const { message } = socket
 import {  
     ON, 
     Event,  
@@ -63,7 +62,7 @@ export default class Popup implements View {
         })
 
         // Other web-players may broadcast a ShowPopup event at the end of a game
-        socket.onSignalRecieved(message.ShowPopup, (data: { message: string }) => {
+        socket.onSignalRecieved(sigMessage.ShowPopup, (data: { message: string }) => {
             this.show(data.message)
         })
 
