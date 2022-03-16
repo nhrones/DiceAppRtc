@@ -7,4 +7,4 @@ export const SSEReadyState = {
     CLOSED: 2,
 }
 
-export const SignalServer = 'http://rtc-signal-server.deno.dev'
+export const SignalServer = 'https://rtc-signal-server.deno.dev'
