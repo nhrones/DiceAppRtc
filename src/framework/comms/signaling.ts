@@ -8,12 +8,12 @@ import { game } from '../../model/diceGame.js';
 
 export let thisID = 'Player1'
 //const proto = (window.location.protocol === 'http:') ? 'ws://' : 'wss://';
-const host = window.location.host 
-const SignalServerURL = (host === '127.0.0.1' || host === 'localhost') 
+const host = window.location.hostname
+const SignalServerURL = (host === '127.0.0.1' || host === 'localhost')
     ? 'http://localhost:8000'
     : SignalServer
 
-console.log('SignalServerURL',SignalServerURL)
+console.log('SignalServerURL', SignalServerURL)
 
 /** 
  * Each Map-entry holds an array of callback functions mapped to a topic ID 
@@ -35,7 +35,20 @@ export const initialize = (name: string, id: string) => {
 
     // close the sse when the window closes
     window.addEventListener('beforeunload', () => {
-        disconnect()
+        if (sse.readyState === state.open) {
+            const sigMsg = JSON.stringify(
+                {
+                    from: thisID,
+                    event: 'close',
+                    data: thisID + ' window was closed!',
+                    id: 0
+                }
+            )
+            fetch(SignalServerURL, {
+                method: "POST",
+                body: sigMsg
+            })
+        }
     })
 
     /** 
@@ -49,7 +62,7 @@ export const initialize = (name: string, id: string) => {
      * ReadableStream through the body property of 
      * a Response object.
     */
-    sse = new EventSource(SignalServerURL +'/listen/' + id)
+    sse = new EventSource(SignalServerURL + '/listen/' + id)
 
     sse.onopen = () => {
         if (DEBUG) console.log('Sse.onOpen! >>>  webRTC.start()');
@@ -93,14 +106,14 @@ export const initialize = (name: string, id: string) => {
         webRTC.start()
         if (game) { game.resetGame() }
     })
-    
+
     sse.addEventListener('GameIsFull', (ev: MessageEvent) => {
         const msg = `Sorry! This game is full!
     Please close the tab/window! 
     Try again in a minute or two!`
         if (DEBUG) console.log(msg)
         alert(msg);
-    
+
         // close this tab/window
         self.opener = self;
         self.close();

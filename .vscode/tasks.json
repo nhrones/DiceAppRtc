@@ -4,11 +4,11 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run App Server",
+            "label": "Run DiceApp Server",
             "type": "shell",
             "command": "deno",
             "options": {
-                "cwd": "../RtcDiceAppServer",
+                "cwd": "../DiceAppServer",
                 "env": {
                     "DEBUG": "true", 
                     "DENO_REGION" : "localhost"
@@ -25,7 +25,7 @@
             ],
             "windows": {
                 "options": {
-                    "cwd": "../RtcDiceAppServer",
+                    "cwd": "../DiceAppServer",
                     "env": {
                         "DEBUG": "true", 
                         "DENO_REGION" : "localhost"
@@ -58,7 +58,7 @@
             "type": "shell",
             "command": "deno",
             "options": {
-                "cwd": "../RtcSignalServer",
+                "cwd": "../SignalServer",
                 "env": {
                     "DEBUG": "true", 
                     "MAX_CONNECTS": "2", 
@@ -75,7 +75,7 @@
             ],
             "windows": {
                 "options": {
-                    "cwd": "../RtcSignalServer",
+                    "cwd": "../SignalServer",
                     "env": {
                         "DEBUG": "true",
                         "MAX_CONNECTS": "2", 
