@@ -2,7 +2,8 @@
 import { DiceGame } from './model/diceGame.js';
 import { Container, container } from './view/container.js'
 import * as signaler from './framework/comms/signaling.js';
-import { DEBUG } from './constants.js'
+import { LogLevel, debug, error} from './constants.js'
+
 
 let name = prompt("What's your name?", "Bill") || 'Nick';
 let t = Date.now().toString()
@@ -14,12 +15,19 @@ signaler.onEvent('GameFull', () => {
     const msg = `Sorry! This game is full!
 Please close the tab/window! 
 Try again in a minute or two!`
-    if (DEBUG) console.log(msg)
+    if (LogLevel >= debug) console.log(msg)
     alert(msg);
 
     // close this tab/window
     self.opener = self;
     self.close();
+})
+
+// show UI updates from WebRTC
+signaler.onEvent('UpdateUI', (content: unknown) => {
+    console.info('UpdateUI: ', content)
+    //TODO needs work
+    //Fire(Event.ShowPopup, { message: content })
 })
 
 // wait for it ...

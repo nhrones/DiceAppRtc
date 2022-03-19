@@ -5,11 +5,6 @@ import { container, ctx } from '../../view/container.js'
 import * as viewElements from './viewElements.js'
 import { View } from '../../types.js';
 
-const {
-    Event: _,
-    Fire: fireEvent,
-} = events
-
 ///////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //          aliases for faster resolution           \\
 //          helps to reduce pressure on GC          \\
@@ -119,12 +114,11 @@ function handleMouseMove(evt: MouseEvent,) {
  * Uses the canvasContexts 'isPointInPath' method for hit-testing.     
  * If a hit is detected, calls the elements touched() method.    
  * The elements touched() method will then broadcast an 'event' to all subscribers.   
- * 
- * @param(number) mX - an adjusted horizontal position of this event
- * @param(number) mY - an adjusted vertical position of this event
  */
 function handleClickOrTouch(mX: number, mY: number) {
     hit = false
+    // TODO Needs work
+    //events.Fire( events.Event.HidePopup, '')
     // reject all local events when not our turn
     if (currentPlayer.id === thisPlayer.id) {
         x = mX - canvas.offsetLeft

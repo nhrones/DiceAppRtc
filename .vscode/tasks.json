@@ -10,7 +10,7 @@
             "options": {
                 "cwd": "../DiceAppServer",
                 "env": {
-                    "DEBUG": "true", 
+                    "LOGLEVEL": "4", 
                     "DENO_REGION" : "localhost"
                 },
             },
@@ -27,7 +27,7 @@
                 "options": {
                     "cwd": "../DiceAppServer",
                     "env": {
-                        "DEBUG": "true", 
+                        "LOGLEVEL": "4", 
                         "DENO_REGION" : "localhost"
                     },
                 },
@@ -60,7 +60,7 @@
             "options": {
                 "cwd": "../SignalServer",
                 "env": {
-                    "DEBUG": "true", 
+                    "LOGLEVEL": "4",  
                     "MAX_CONNECTS": "2", 
                     "DENO_REGION" : "localhost"
                 },
@@ -77,7 +77,7 @@
                 "options": {
                     "cwd": "../SignalServer",
                     "env": {
-                        "DEBUG": "true",
+                        "LOGLEVEL": "4", 
                         "MAX_CONNECTS": "2", 
                         "DENO_REGION" : "localhost"
                     },

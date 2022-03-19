@@ -1,8 +1,4 @@
 
-
-
-
-
 /** 
  * ScoringMessage type 
  */

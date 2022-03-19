@@ -67,10 +67,10 @@ const dispatch = (subscriptions: Function[], data: string | object) => {
 /** exported Event names list */
 export const Event = {
     ButtonTouched: 'ButtonTouched',
-    CancelEdits: 'CancelEdits',
     DieTouched: 'DieTouched',
     HidePopup: 'HidePopup',
-    PlayerNameUpdate: 'PlayerNameUpdate',
+    PeerDisconnected: 'PeerDisconnected',
+    PeerInitialize: 'PeerInitialize',
     PopupResetGame: 'PopupResetGame',
     ScoreButtonTouched: 'ScoreButtonTouched',
     ScoreElementResetTurn: 'ScoreElementResetTurn',

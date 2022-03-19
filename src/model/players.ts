@@ -1,7 +1,7 @@
-import { onEvent, sendSSEmessage } from '../framework/comms/signaling.js'
-import { Event, Fire } from '../framework/model/events.js'
+import { onEvent, signal } from '../framework/comms/signaling.js'
+import { Event, Fire, when } from '../framework/model/events.js'
 import { Player } from '../types.js'
-import { DEBUG } from '../constants.js'
+import { LogLevel, debug, error, info } from '../constants.js'
 import { DiceGame } from './diceGame.js'
 
 const MAXPLAYERS = 2
@@ -28,15 +28,33 @@ export const init = (thisgame: DiceGame, color: string) => {
         lastScore: ''
     }
  
-    // this can only be Player2 as Player1 is set internally onSetID in app.ts
-    onEvent('RegisterPlayer', (player: {id: string, name: string}) => {
+    // WebRTC disconnect - can only be peer2
+    when(Event.PeerDisconnected, ()=>{
+        removePlayer([...players][1].id)
+    })
+    
+    // this will be Player1 as SetID happens at startup
+    onEvent('SetID', (data: {id: string, name: string}) => {
+        const {id, name} = data
+        console.log("players::onEvent('SetID') - id: " + id + " name: " + name )
+        addPlayer(id, name)
+        thisPlayer.id = id
+        thisPlayer.playerName = name  
+        // this looks redundant (setThisPlayer, then below, addPlayer )
+        //setThisPlayer(Players.thisPlayer) // do this in addPlayer
+        setCurrentPlayer(thisPlayer) // do this in addPlayer
+        if (game) { game.resetGame() }
+    })
+    
+    // this can only be Player2 as Player1 is set internally above on-SetID event
+    onEvent('RegisterPeer', (player: {id: string, name: string}) => {
         console.log('playerid: ', player.id)
         const {id, name} = player
-        if (DEBUG) console.log(`Players.RegisterPlayer ${id}  ${name}`)
+        if (LogLevel >= debug) console.log(`Players.RegisterPeer ${id}  ${name}`)
         addPlayer(id, name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
-        sendSSEmessage({event: 'UpdatePlayers', data: Array.from(players.values())})
+        signal({event: 'UpdatePlayers', data: Array.from(players.values())})
     })
 
     // will only come from focused-player (currentPlayer)
@@ -123,17 +141,23 @@ const updatePlayer = (index: number, color: string, text: string) => {
  * @param(string) id - the id of the new player
  */
 export const addPlayer = (id: string, playerName: string) => {
-    if (DEBUG) console.log('add player ', id + '  ' + playerName)
+    if (LogLevel >= debug) console.log('add player ', id + '  ' + playerName)
+    
+    // handle any missing name with a default
     if (playerName === 'Player') {
         const num = players.size + 1
         playerName = 'Player' + num;
     }
+    
+    // if thisPlayer has not yet been registered
     if (thisPlayer.id === "") {
         thisPlayer.id = id
         thisPlayer.playerName = playerName
         players.add(thisPlayer)
-    } else {
-        if (DEBUG) console.log(`Players adding, id:${id} name: ${playerName}`)
+    } 
+    // go ahead and add the new player
+    else {
+        if (LogLevel >= debug) console.log(`Players adding, id:${id} name: ${playerName}`)
         players.add(
             {
                 id: id,
@@ -145,7 +169,7 @@ export const addPlayer = (id: string, playerName: string) => {
             }
         )
     }
-    if (DEBUG) console.info(' added player', Array.from(players.values()))
+    if (LogLevel >= debug) console.info(' added player', Array.from(players.values()))
 
 }
 
@@ -157,7 +181,7 @@ export const addPlayer = (id: string, playerName: string) => {
 export const removePlayer = (id: string) => {
     const p = getById(id)
     if(p === null) return
-    if (DEBUG) console.info(' removing player', p)
+    if (LogLevel >= debug) console.info(' removing player', p)
     players.delete(p)
     refreshPlayerColors();
     setThisPlayer([...players][0])
@@ -201,7 +225,7 @@ const playerColors = ["Brown", "Green", "RoyalBlue", "Red"]
 
 
 export const setThisPlayer = (player: Player) => {
-    if (DEBUG) console.log(`Step-4 - Players.setThisPlayer: ${player.playerName}`)
+    if (LogLevel >= debug) console.log(`Step-4 - Players.setThisPlayer: ${player.playerName}`)
     const favicon = document.getElementById("favicon") as HTMLLinkElement
     thisPlayer = player
     document.title = thisPlayer.playerName
@@ -227,7 +251,6 @@ export let currentPlayer: Player = {
 }
 
 export const setCurrentPlayer = (player: Player) => {
-
-    if (DEBUG) console.log(`Step-5 - Players.settingCurrentPlayer: ${player.playerName}`)
+    if (LogLevel >= debug) console.log(`Step-5 - Players.settingCurrentPlayer: ${player.playerName}`)
     currentPlayer = player
 }

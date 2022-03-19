@@ -2,12 +2,7 @@ import {} from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import  * as socket  from '../framework/comms/signaling.js'
-
-import {  
-    when, 
-    Event,  
-    Fire 
-} from '../framework/model/events.js'
+import { when, Event, Fire } from '../framework/model/events.js'
 
 let left = 1
 let top = 1
