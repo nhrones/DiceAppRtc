@@ -87,7 +87,7 @@ export const initialize = () => {
  * Start the peerConnection process by signaling an invitation 
  */
 export const start = () => {
-    // restart the signaler then wait for an `accept invitation`
+    // restart the signaler then wait for an `acceptInvitation` message
     sendSSEmessage({event: 'invitation', data: {}});
 } 
 
@@ -187,7 +187,7 @@ function checkDataChannelState() {
 export async function makeConnection() {
     createPeerConnection(true);
     const offer = await peerConnection.createOffer();
-    sendSSEmessage({event: 'RtcOffer', data: { type: 'offer', sdp: offer.sdp }});
+    sendSSEmessage({event:'RtcOffer', data: { type: 'offer', sdp: offer.sdp }});
     // Note that RTCPeerConnection won't start gathering 
     // candidates until setLocalDescription() is called.
     await peerConnection.setLocalDescription(offer);
