@@ -1,13 +1,14 @@
-import { SignalingMessage, sigMessage, rtcMessage } from '../../types.js'
+
+import { rtcMessage } from './RTClib.js'
+import { SignalingMessage, sigMessage, SSE } from './SIGlib.js'
 import { Event, Fire } from '../model/events.js'
 import * as webRTC from './webRTC.js'
-import { DEBUG, SSEReadyState, SignalServer } from '../../constants.js'
+import { DEBUG, SignalServer } from '../../constants.js'
 import * as Players from '../../model/players.js'
 import { game } from '../../model/diceGame.js';
 
-
 export let thisID = 'Player1'
-//const proto = (window.location.protocol === 'http:') ? 'ws://' : 'wss://';
+
 const host = window.location.hostname
 const SignalServerURL = (host === '127.0.0.1' || host === 'localhost')
     ? 'http://localhost:8000'
@@ -35,7 +36,7 @@ export const initialize = (name: string, id: string) => {
 
     // close the sse when the window closes
     window.addEventListener('beforeunload', () => {
-        if (sse.readyState === state.open) {
+        if (sse.readyState === SSE.OPEN) {
             const sigMsg = JSON.stringify(
                 {
                     from: thisID,
@@ -121,19 +122,11 @@ export const initialize = (name: string, id: string) => {
 
 }
 
-/**
- * SSE ReadyState
- */
-export const state = {
-    connecting: 0,
-    open: 1,
-    closed: 2
-}
 
 export const getState = (msg: string) => {
-    if (sse.readyState === state.connecting) console.log(msg + ' - ' + 'SSE-State - connecting')
-    if (sse.readyState === state.open) console.log(msg + ' - ' + 'SSE-State - open')
-    if (sse.readyState === state.closed) console.log(msg + ' - ' + 'SSE-State - closed')
+    if (sse.readyState === SSE.CONNECTING) console.log(msg + ' - ' + 'SSE-State - connecting')
+    if (sse.readyState === SSE.OPEN) console.log(msg + ' - ' + 'SSE-State - open')
+    if (sse.readyState === SSE.CLOSED) console.log(msg + ' - ' + 'SSE-State - closed')
 }
 
 /**
@@ -209,14 +202,9 @@ export const onSignalRecieved = (topic: number, listener: Function) => {
  *  or, to the DataChannel to be broadcast to peers
  *	@param msg (SignalingMessage) - both `topic` and `data`
   */
-export const sendSignal = (msg: SignalingMessage) => {
-    if (webRTC.dataChannel && webRTC.dataChannel.readyState === 'open') {
-        //TODO Why are we using an array here??
-        // just use a SignalingMessage object {topic,data}
-        const webRTCmsg = JSON.stringify(msg)
-        if (DEBUG) console.info('Sending to DataChannel >> :', webRTCmsg)
-        webRTC.dataChannel.send(webRTCmsg)
-    } else if (sse.readyState === SSEReadyState.OPEN) {
+ export const sendSSEmessage = (msg: SignalingMessage) => {
+
+    if (sse.readyState === SSE.OPEN) {
         const sigMsg = JSON.stringify({ from: thisID, topic: msg.topic, data: msg.data })
         if (DEBUG) console.log('Sending to sig-server >>> :', sigMsg)
         fetch(SignalServerURL, {
@@ -227,4 +215,3 @@ export const sendSignal = (msg: SignalingMessage) => {
         console.error('No place to send the message:', msg.topic)
     }
 }
-

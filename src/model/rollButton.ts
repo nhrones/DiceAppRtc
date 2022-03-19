@@ -1,5 +1,6 @@
-import { sigMessage } from '../types.js'
-import { onSignalRecieved, sendSignal } from '../framework/comms/signaling.js'
+import { sigMessage } from '../framework/comms/SIGlib.js'
+import { onSignalRecieved } from '../framework/comms/signaling.js'
+import { sendSignal } from '../framework/comms/webRTC.js'
 import { ON, Event, Fire } from '../framework/model/events.js'
 import * as dice from './dice.js'
 

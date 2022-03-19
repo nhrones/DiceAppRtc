@@ -1,5 +1,5 @@
-import { sigMessage } from '../types.js'
-import { onSignalRecieved, sendSignal } from '../framework/comms/signaling.js'
+import { sigMessage } from '../framework/comms/SIGlib.js'
+import { onSignalRecieved, sendSSEmessage } from '../framework/comms/signaling.js'
 import { Event, Fire } from '../framework/model/events.js'
 import { Player } from '../types.js'
 import { DEBUG } from '../constants.js'
@@ -38,7 +38,7 @@ export const init = (thisgame: DiceGame, color: string) => {
         addPlayer(id, name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
-        sendSignal({topic: sigMessage.UpdatePlayers, data: Array.from(players.values())})
+        sendSSEmessage({topic: sigMessage.UpdatePlayers, data: Array.from(players.values())})
     })
 
     // will only come from focused-player (currentPlayer)

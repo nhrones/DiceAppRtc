@@ -1,4 +1,4 @@
-import { sigMessage } from './types.js'
+import { sigMessage } from './framework/comms/SIGlib.js'
 import { DiceGame } from './model/diceGame.js';
 import { Container, container } from './view/container.js'
 import * as signaler from './framework/comms/signaling.js';

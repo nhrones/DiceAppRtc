@@ -3,7 +3,7 @@ import {} from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import  * as socket  from '../framework/comms/signaling.js'
-import { sigMessage } from '../types.js'
+import { sigMessage } from '../framework/comms/SIGlib.js'
 
 import {  
     ON, 

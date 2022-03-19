@@ -1,14 +1,16 @@
 
-import { Player, rtcMessage, sigMessage } from '../../types.js'
-import { dispatch, onSignalRecieved, sendSignal } from './signaling.js'
+import { ReadyState, rtcMessage } from './RTClib.js'
+import { SignalingMessage, sigMessage } from './SIGlib.js'
+import { dispatch, onSignalRecieved, sendSSEmessage } from './signaling.js'
 import { DEBUG } from '../../constants.js'
 import { Event, Fire } from '../model/events.js'
-import {players, removePlayer} from '../../model/players.js'
-export let peerConnection: RTCPeerConnection;
+import { players, removePlayer } from '../../model/players.js'
+
 
 /** 
  * The RTCDataChannel API enables peer-to-peer exchange of data 
  */
+export let peerConnection: RTCPeerConnection;
 export let dataChannel: RTCDataChannel;
 export let RTCopen = false
 
@@ -20,7 +22,7 @@ export const initialize = () => {
     // handle a Session-Description-Offer 
     // param {RTCSessionDescriptionInit} offer - {topic: string, sdp: string}
     onSignalRecieved(rtcMessage.RtcOffer, async (offer: RTCSessionDescriptionInit) => {
-        
+        //todo move external
         console.info('offer: ', offer)
         if (peerConnection) {
             if (DEBUG) console.error('existing peerconnection');
@@ -29,7 +31,7 @@ export const initialize = () => {
         createPeerConnection(false);
         await peerConnection.setRemoteDescription(offer);
         const answer = await peerConnection.createAnswer();
-        sendSignal({topic:rtcMessage.RtcAnswer, data:{ type: 'answer', sdp: answer.sdp }});
+        sendSSEmessage({topic:rtcMessage.RtcAnswer, data:{ type: 'answer', sdp: answer.sdp }});
 
         // Note that RTCPeerConnection won't start gathering 
         // candidates until setLocalDescription() is called.
@@ -85,8 +87,8 @@ export const initialize = () => {
  * Start the peerConnection process by signaling an invitation 
  */
 export const start = () => {
-    // restart the signaler then wait for an invite
-    sendSignal({topic:rtcMessage.invitation, data:{}});
+    // restart the signaler then wait for an `accept invitation`
+    sendSSEmessage({topic:rtcMessage.invitation, data:{}});
 } 
 
 /** 
@@ -131,7 +133,7 @@ function createPeerConnection(isOfferer: boolean) {
             init.sdpMLineIndex = event.candidate.sdpMLineIndex;
         }
         // sent over the signaler to the remote peer.
-        sendSignal({topic:rtcMessage.candidate, data:init});
+        sendSSEmessage({topic:rtcMessage.candidate, data:init});
     };
 
     // creating data channel 
@@ -186,7 +188,7 @@ function checkDataChannelState() {
 export async function makeConnection() {
     createPeerConnection(true);
     const offer = await peerConnection.createOffer();
-    sendSignal({topic: rtcMessage.RtcOffer, data: { type: 'offer', sdp: offer.sdp }});
+    sendSSEmessage({topic: rtcMessage.RtcOffer, data: { type: 'offer', sdp: offer.sdp }});
     // Note that RTCPeerConnection won't start gathering 
     // candidates until setLocalDescription() is called.
     await peerConnection.setLocalDescription(offer);
@@ -200,9 +202,20 @@ function updateUI(msg: { content: string, clearContent?: boolean }) {
     if (DEBUG) console.log(msg.content)
 }
 
-export const ReadyState = {
-    closed: 'closed',
-    closing: 'closing',
-    connecting: 'connecting',
-    open: 'open',
+
+/**
+ *  Sends a message to either the signally service 
+ *  or, to the DataChannel to be broadcast to peers
+ *	@param msg (SignalingMessage) - both `topic` and `data`
+  */
+ export const sendSignal = (msg: SignalingMessage) => {
+    if (dataChannel && dataChannel.readyState === 'open') {
+        //TODO Why are we using an array here??
+        // just use a SignalingMessage object {topic,data}
+        const jsonMsg = JSON.stringify(msg)
+        if (DEBUG) console.info('Sending to DataChannel >> :', jsonMsg)
+        dataChannel.send(jsonMsg)
+    } else {
+        console.error('No place to send the message:', msg.topic)
+    }
 }
