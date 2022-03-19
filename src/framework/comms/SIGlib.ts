@@ -1,27 +1,23 @@
-import { rtcMessage } from './RTClib'
 
-/** 
- * signal event message list 
- */
- export enum sigMessage {
-    RegisterPlayer = 0, // signaling: 86, players: 33
-    RemovePlayer = 1,   // players: 76, server::signaler: 80
-    ResetGame = 2,      // diceGame: 72, 78
-    ResetTurn = 3,      // diceGame: 66, scoreElement: 66
-    ShowPopup = 4,      // diceGame: 195, popup : 66
-    UpdateRoll = 5,     // rollButton: 17, 22
-    UpdateScore = 6,    // webRTC: 160, scoreElement: 64
-    UpdateDie = 7,      // dice: 65, 71
-    UpdatePlayers = 8,  // players: 41, 45
-    SetID = 9,          // app: 22
-    GameFull = 10,      // app: 29
-}
+/*signal event message list 
+    RegisterPlayer  signaling: 86, players: 33
+    RemovePlayer    players: 76, server::signaler: 80
+    ResetGame       diceGame: 72, 78
+    ResetTurn       diceGame: 66, scoreElement: 66
+    ShowPopup       diceGame: 195, popup : 66
+    UpdateRoll      rollButton: 17, 22
+    UpdateScore     webRTC: 160, scoreElement: 64
+    UpdateDie       dice: 65, 71
+    UpdatePlayers   players: 41, 45
+    SetID           app: 22
+    GameFull        app: 29
+*/
 
 /** 
  * SignalingMessage type 
  */
  export type SignalingMessage = { 
-    topic: sigMessage | rtcMessage, 
+    event:  string, 
     data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string[] | string, 
 }
 

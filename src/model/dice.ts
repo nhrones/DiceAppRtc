@@ -1,7 +1,7 @@
-import { sigMessage } from '../framework/comms/SIGlib.js'
-import { onSignalRecieved } from '../framework/comms/signaling.js'
+
+import { onEvent as onEvent } from '../framework/comms/signaling.js'
 import { sendSignal } from '../framework/comms/webRTC.js'
-import { ON, Event, Fire } from '../framework/model/events.js'
+import { when, Event, Fire } from '../framework/model/events.js'
 import * as PlaySound from '../framework/model/sounds.js'
 import * as evaluator from './diceEvaluator.js'
 import { game } from './diceGame.js'
@@ -56,7 +56,7 @@ export const init = () => {
     ///////////////////////////////////////////////
 
     // register a callback function for the `internal` DieTouched event
-    ON(Event.DieTouched, (data: { index: number }) => {
+    when(Event.DieTouched, (data: { index: number }) => {
         const { index } = data
         const thisDie = die[index] as any
         if (thisDie.value > 0) {
@@ -64,13 +64,13 @@ export const init = () => {
             updateView(index, thisDie.value, thisDie.frozen)
             PlaySound.Select()
             // inform all other players
-            sendSignal({topic: sigMessage.UpdateDie, data:{ dieNumber: index}})
+            sendSignal({event: 'UpdateDie', data:{ dieNumber: index}})
         }
     })
 
     // register a callback function for the UpdateDie signaling event
     // sent when other player touched their die ...
-    onSignalRecieved(sigMessage.UpdateDie, (data: { dieNumber: number }) => {
+    onEvent('UpdateDie', (data: { dieNumber: number }) => {
         const targetDie = die[data.dieNumber]
         if (targetDie.value > 0) {
             targetDie.frozen = !targetDie.frozen

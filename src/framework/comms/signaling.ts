@@ -1,6 +1,5 @@
 
-import { rtcMessage } from './RTClib.js'
-import { SignalingMessage, sigMessage, SSE } from './SIGlib.js'
+import { SignalingMessage, SSE } from './SIGlib.js'
 import { Event, Fire } from '../model/events.js'
 import * as webRTC from './webRTC.js'
 import { DEBUG, SignalServer } from '../../constants.js'
@@ -17,9 +16,9 @@ const SignalServerURL = (host === '127.0.0.1' || host === 'localhost')
 console.log('SignalServerURL', SignalServerURL)
 
 /** 
- * Each Map-entry holds an array of callback functions mapped to a topic ID 
+ * Each Map-entry holds an array of callback functions mapped to an event ID 
  */
-const subscriptions = new Map<number, Function[]>()
+const subscriptions = new Map<number | string, Function[]>()
 
 /** 
  * this clients WebSocket connection to the server 
@@ -80,10 +79,9 @@ export const initialize = (name: string, id: string) => {
         if (DEBUG) console.log('>>>>>>>  signaler recieved  >>>>>>>>  ', msg.data)
         const msgObject = JSON.parse(msg.data)
         if (DEBUG) console.info('      parsed data = ', msgObject)
-        const topic = msgObject.topic
-        let topicName = (topic > 10) ? rtcMessage[topic] : sigMessage[topic]
-        if (DEBUG) console.info('               topic: ', topicName) // show the topic name
-        dispatch(topic, msgObject.data)
+        const event = msgObject.event
+        if (DEBUG) console.info('               event: ', event)
+        dispatch(event, msgObject.data)
     }
 
     // dedicated listener for the SetID event
@@ -91,7 +89,7 @@ export const initialize = (name: string, id: string) => {
     sse.addEventListener('SetID', (ev: MessageEvent) => {
         const msgObject = JSON.parse(ev.data)
         const { data } = msgObject
-        dispatch(msgObject.topic, msgObject.data)
+        dispatch(msgObject.event, msgObject.data)
         console.log('on.SetID - data type = ' + (typeof data) + ' id ' + data.id)
         thisID = data.id
         Players.thisPlayer.id = data.id
@@ -154,11 +152,10 @@ export const registerPlayer = (id: string, name: string) => {
     // Since we're registering, we'll expect to recieve a 'PlayerUpdate' response
     const regObj = {
         from: id,
-        topic: sigMessage.RegisterPlayer,
+        event: 'RegisterPlayer',
         data: { id: id, name: name }
     }
     const msg = JSON.stringify(regObj)
-    console.log('Step-6 - POST registeringPlayer >>> ', msg)
     fetch(SignalServerURL, {
         method: "POST",
         body: msg
@@ -169,12 +166,12 @@ export const registerPlayer = (id: string, name: string) => {
  * Dispatches a message event to all registered listeners with optional data     
  * Called from both `socket.onmessage` and from WebRTC.`dataChannel.onmessage`. 	  
  * @example dispatch( message.ResetTurn, {currentPlayerIndex: 1} )    
- * @param topic (message) - the topic of interest
+ * @param event (message) - the event of interest
  * @param data (string | string[] | object) - optional data to report to subscribers
  */
-export const dispatch = (topic: sigMessage, data: string | string[] | object) => {
-    if (subscriptions.has(topic)) {
-        const subs = subscriptions.get(topic)!
+export const dispatch = (event: string, data: string | string[] | object) => {
+    if (subscriptions.has(event)) {
+        const subs = subscriptions.get(event)!
         if (subs) {
             for (const callback of subs) {
                 callback(data != undefined ? data : {})
@@ -184,34 +181,32 @@ export const dispatch = (topic: sigMessage, data: string | string[] | object) =>
 }
 
 /**
- *  registers a callback function to be executed when a topic is published
+ *  registers a callback function to be executed when a event is published
  *	@example onSignalRecieved(message.ResetTurn, this.resetTurn)
- *	@param topic (string) - the topic of interest
+ *	@param event (string) - the event of interest
  *	@param listener (function) - a callback function
  */
-export const onSignalRecieved = (topic: number, listener: Function) => {
-    if (!subscriptions.has(topic)) {
-        subscriptions.set(topic, [])
+export const onEvent = (event: number | string, listener: Function) => {
+    if (!subscriptions.has(event)) {
+        subscriptions.set(event, [])
     }
-    const callbacks = subscriptions.get(topic)!
+    const callbacks = subscriptions.get(event)!
     callbacks.push(listener)
 }
 
 /**
- *  Sends a message to either the signally service 
- *  or, to the DataChannel to be broadcast to peers
- *	@param msg (SignalingMessage) - both `topic` and `data`
+ *  Sends a message to the signal service to be broadcast to peers
+ *	@param msg (SignalingMessage) - both `event` and `data`
   */
  export const sendSSEmessage = (msg: SignalingMessage) => {
-
     if (sse.readyState === SSE.OPEN) {
-        const sigMsg = JSON.stringify({ from: thisID, topic: msg.topic, data: msg.data })
+        const sigMsg = JSON.stringify({ from: thisID, event: msg.event, data: msg.data })
         if (DEBUG) console.log('Sending to sig-server >>> :', sigMsg)
         fetch(SignalServerURL, {
             method: "POST",
             body: sigMsg
         })
     } else {
-        console.error('No place to send the message:', msg.topic)
+        console.error('No place to send the message:', msg.event)
     }
 }

@@ -1,5 +1,5 @@
 
-import { ON, Event, Fire } from '../framework/model/events.js'
+import { when, Event, Fire } from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { ctx } from './container.js'
 
@@ -41,7 +41,7 @@ export default class Die implements View {
         //                         bind events                       \\
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-        ON(Event.UpdateDie + this.index, (state: {frozen: boolean, value: number}) => {
+        when(Event.UpdateDie + this.index, (state: {frozen: boolean, value: number}) => {
                 this.frozen = state.frozen
                 this.value = state.value
                 this.render(state)

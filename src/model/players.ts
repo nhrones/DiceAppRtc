@@ -1,5 +1,4 @@
-import { sigMessage } from '../framework/comms/SIGlib.js'
-import { onSignalRecieved, sendSSEmessage } from '../framework/comms/signaling.js'
+import { onEvent, sendSSEmessage } from '../framework/comms/signaling.js'
 import { Event, Fire } from '../framework/model/events.js'
 import { Player } from '../types.js'
 import { DEBUG } from '../constants.js'
@@ -29,20 +28,19 @@ export const init = (thisgame: DiceGame, color: string) => {
         lastScore: ''
     }
  
-    //HACK Can only be Player2 as Player1 is set internally onSetID in app.ts
-    onSignalRecieved(sigMessage.RegisterPlayer, (player: {id: string, name: string}) => {
-        if (DEBUG) console.info('@@@@@@@@@@@@@@@@@@@@@@@Players Got RegisterPlayer: @@@@@@@@@@@@@@@@@', (typeof player))
+    // this can only be Player2 as Player1 is set internally onSetID in app.ts
+    onEvent('RegisterPlayer', (player: {id: string, name: string}) => {
         console.log('playerid: ', player.id)
         const {id, name} = player
         if (DEBUG) console.log(`Players.RegisterPlayer ${id}  ${name}`)
         addPlayer(id, name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
-        sendSSEmessage({topic: sigMessage.UpdatePlayers, data: Array.from(players.values())})
+        sendSSEmessage({event: 'UpdatePlayers', data: Array.from(players.values())})
     })
 
     // will only come from focused-player (currentPlayer)
-    onSignalRecieved(sigMessage.UpdatePlayers, (playersArray: Player[]) => {
+    onEvent('UpdatePlayers', (playersArray: Player[]) => {
         // clear the players set
         players.clear()
 
@@ -73,7 +71,7 @@ export const init = (thisgame: DiceGame, color: string) => {
     //
     //  sent from server on socket.close()
     //
-    onSignalRecieved(sigMessage.RemovePlayer, (id: string) => {
+    onEvent('RemovePlayer', (id: string) => {
         removePlayer(id)
         game.resetGame()
     })

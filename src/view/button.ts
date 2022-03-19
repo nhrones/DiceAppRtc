@@ -1,5 +1,5 @@
 
-import { ON, Event, Fire }  from '../framework/model/events.js'
+import { when, Event, Fire }  from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import Label from './label.js'
@@ -52,7 +52,7 @@ export default class Button implements View {
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         // the viewModel will emit this event whenever it needs to update this view
-        ON(Event.UpdateButton + this.name,
+        when(Event.UpdateButton + this.name,
                 (data: { text: string , color: string, enabled: boolean }) => {
                 this.enabled = data.enabled
                 this.color = data.color //_background

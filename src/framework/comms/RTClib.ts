@@ -2,13 +2,14 @@
 /** 
  * WebRTC signal eventlist 
  */
- export enum rtcMessage {
-    Bye = 11,
-    RtcOffer = 12,
-    RtcAnswer = 13,
-    candidate = 14,
-    invitation = 15
-}
+ //export enum rtcMessage {
+    //Bye = 11,
+    //RtcOffer = 12,
+    //RtcAnswer = 13,
+    //candidate = 14,
+    //invitation = 15,
+    //UpdatePlayers = 16
+//}
 
 // constants
 export const ICEconfiguration = {

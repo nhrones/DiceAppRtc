@@ -1,7 +1,7 @@
-import { sigMessage } from '../framework/comms/SIGlib.js'
-import { onSignalRecieved } from '../framework/comms/signaling.js'
+
+import { onEvent } from '../framework/comms/signaling.js'
 import { sendSignal } from '../framework/comms/webRTC.js'
-import { ON, Event, Fire } from '../framework/model/events.js'
+import { when, Event, Fire } from '../framework/model/events.js'
 import { Player } from '../types.js'
 import { currentPlayer, thisPlayer } from './players.js'
 import * as PlaySound from '../framework/model/sounds.js'
@@ -36,7 +36,6 @@ export default class ScoreElement {
     scoringDieset: number[]
     scoringDiesetSum: number
     hasFiveOfaKind: boolean = false
-    updateScoreMsg: number
     
     /** 
      * constructor ... called from DiceGame.buildScoreItems()
@@ -53,29 +52,28 @@ export default class ScoreElement {
         this.finalValue = 0
         this.possibleValue = 0
         this.scoringDieset = [0, 0, 0, 0, 0]
-        this.updateScoreMsg = 100 + this.index
-        
+
         ///////////////////////////////////////////////    
         //               bind events                 //
         /////////////////////////////////////////////// 
         
         // when I select a score
-        ON(`${Event.ScoreButtonTouched}${this.index}`, () => {
+        when(Event.ScoreButtonTouched + this.index, () => {
             // notify all other players
-            sendSignal({topic: this.updateScoreMsg, data:""})
+            sendSignal({event: 'UpdateScore' + this.index, data:""})
             if (this.clicked()) {
-                sendSignal({topic: sigMessage.ResetTurn, data:""})
+                sendSignal({event: 'ResetTurn', data:""})
                 Fire(Event.ScoreElementResetTurn, "")
             }
         })
 
         // when other players select a score
-        onSignalRecieved(this.updateScoreMsg, () => {
+        onEvent('UpdateScore' + this.index, () => {
             this.clicked()
         })
 
         // show a message at bottom of screen when a user hovers on this element
-        ON(Event.UpdateTooltip + this.index, (data: { hovered: boolean }) => {
+        when(Event.UpdateTooltip + this.index, (data: { hovered: boolean }) => {
 
             let msg = ''
             let thisState = 0

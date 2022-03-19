@@ -4,7 +4,7 @@ import { container, ctx } from './container.js'
 import Label from './label.js'
 
 import {  
-    ON, 
+    when, 
     Event,  
     Fire 
 } from '../framework/model/events.js'
@@ -64,7 +64,7 @@ export default class ScoreButton implements View {
         //                         bind events                       \\
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-        ON(Event.UpdateScoreElement + this.index,
+        when(Event.UpdateScoreElement + this.index,
             (data: {
                 renderAll: boolean,
                 color: string,

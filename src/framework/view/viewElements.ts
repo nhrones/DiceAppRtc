@@ -15,7 +15,7 @@
 //////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 import { View } from '../../types.js'
-import { ON, Event, Fire } from '../model/events.js'
+import { when, Event, Fire } from '../model/events.js'
 import { container } from '../../view/container.js'
 
 export const nodes: Set<View> = new Set()

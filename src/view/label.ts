@@ -1,5 +1,5 @@
 
-import { ON, Event, Fire } from '../framework/model/events.js'
+import { when, Event, Fire } from '../framework/model/events.js'
 import { Geometry, View, LabelState } from '../types.js'
 import { container, ctx } from './container.js'
 
@@ -48,7 +48,7 @@ export default class Label implements View {
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         if (bind) {
-            ON(Event.UpdateLabel + this.name,
+            when(Event.UpdateLabel + this.name,
                 (data: {
                     state: number
                     color: string,
