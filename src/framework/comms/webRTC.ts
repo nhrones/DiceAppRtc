@@ -1,7 +1,5 @@
-
 import { dispatch, onEvent, signal, SignalingMessage } from './signaling.js'
 import { LogLevel, debug } from '../../constants.js'
-import { Event, Fire } from '../model/events.js'
 
 ///////////////////////////////////////////////////////////////////
 // The RTCDataChannel API enables peer-to-peer exchange of data  //
@@ -25,7 +23,7 @@ export const initialize = () => {
         const answer = await peerConnection.createAnswer();
         signal({event: 'RtcAnswer', data:{ type: 'answer', sdp: answer.sdp }});
 
-        // Note that RTCPeerConnection won't start gathering 
+        // Note: the RTCPeerConnection won't start gathering 
         // candidates until setLocalDescription() is called.
         await peerConnection.setLocalDescription(answer);
     })
@@ -61,8 +59,7 @@ export const initialize = () => {
 
     // A peer is offering to connect
     onEvent('invitation', (_data: any) => {
-        // I'll initiate an RTC-connection 
-        // unless I'm engaged already.
+        // I'll initiate an RTC-connection unless I'm engaged already.
         if (peerConnection) {
             if (LogLevel >= debug) console.log(`Already connected, ignoring this 'invitation'!`);
             return;
@@ -90,17 +87,17 @@ function reset (msg: string) {
     dispatch('ShowPopup', msg)
 }
 
-/** creates a peer connection 
- * @param(boolean) isOfferer - are we making the offer?     
+/** creates a new peer connection 
+ * @param(boolean) isOfferor - are we making the offer?     
  *   true when called by makeConnection() - we are sending an offer    
  *   false when called from signaler.when('RtcOffer') - someone else sent us an offer */
-function createPeerConnection(isOfferer: boolean) {
-    if (LogLevel >= debug) console.log('Starting WebRTC as', isOfferer ? 'Offerer' : 'Offeree');
+function createPeerConnection(isOfferor: boolean) {
+    if (LogLevel >= debug) console.log('Starting WebRTC as', isOfferor ? 'Offeror' : 'Offeree');
     peerConnection = new RTCPeerConnection({
         iceServers: [{urls: ["stun:stun1.l.google.com:19302","stun:stun2.l.google.com:19302"]}]
     });
 
-    // local ICE layer passes candidates to us for delivery 
+    // local ICE layer passes `candidates` to us for delivery 
     // to the remote peer over the signaling channel
     peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
         const init: RTCIceCandidateInit = {
@@ -118,14 +115,14 @@ function createPeerConnection(isOfferer: boolean) {
     };
 
     // creating data channel 
-    if (isOfferer) {
-        if (LogLevel >= debug) console.log('Offerer -> creating dataChannel!');
+    if (isOfferor) {
+        if (LogLevel >= debug) console.log('Offeror -> creating dataChannel!');
         // createDataChannel is a factory method on the RTCPeerConnection object
         dataChannel = peerConnection.createDataChannel('chat');
         setupDataChannel();
     } else {
-        // If peer is not the offerer, wait for 
-        // the offerer to pass us a DataChannel
+        // If this peer is not the `offeror`, wait for 
+        // the offeror to pass us a DataChannel
         peerConnection.ondatachannel = (event) => {
             if (LogLevel >= debug) console.log('peerConnection.ondatachannel -> creating dataChannel!');
             dataChannel = event.channel;
