@@ -87,8 +87,7 @@ function reset (msg: string) {
     dataChannel = null
     peerConnection = null
     start()
-    Fire(Event.ShowPopup, { message: msg })
-
+    dispatch('ShowPopup', msg)
 }
 
 /** creates a peer connection 
@@ -161,7 +160,15 @@ function checkDataChannelState() {
     } else if (dataChannel.readyState === ReadyState.closed) {
         if (RTCopen === true) {
             RTCopen = false
-            Fire(Event.PeerDisconnected, '')
+            
+            //TODO decouple from Events
+            // currently handled in ...
+            // players::when(Event.PeerDisconnected, ()=>{
+            //     removePlayer([...players][1].id)
+            // })
+            dispatch('PeerDisconnected', 'Peer has disconnected!') 
+            
+            //Fire(Event.PeerDisconnected, '')
             reset('Peer has disconnected!')
         }
     }

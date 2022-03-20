@@ -29,7 +29,9 @@ export const init = (thisgame: DiceGame, color: string) => {
     }
  
     // WebRTC disconnect - can only be peer2
-    when(Event.PeerDisconnected, ()=>{
+    //hack when(Event.PeerDisconnected, ()=>{
+        
+        onEvent('PeerDisconnected', ()=>{
         removePlayer([...players][1].id)
     })
     
@@ -54,11 +56,11 @@ export const init = (thisgame: DiceGame, color: string) => {
         addPlayer(id, name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
-        signal({event: 'UpdatePlayers', data: Array.from(players.values())})
+        signal({event: 'UpdatePeers', data: Array.from(players.values())})
     })
 
-    // will only come from focused-player (currentPlayer)
-    onEvent('UpdatePlayers', (playersArray: Player[]) => {
+    // will only come from focused-player (currentPeer)
+    onEvent('UpdatePeers', (playersArray: Player[]) => {
         // clear the players set
         players.clear()
 
@@ -89,7 +91,7 @@ export const init = (thisgame: DiceGame, color: string) => {
     //
     //  sent from server on socket.close()
     //
-    onEvent('RemovePlayer', (id: string) => {
+    onEvent('RemovePeer', (id: string) => {
         removePlayer(id)
         game.resetGame()
     })
@@ -135,11 +137,7 @@ const updatePlayer = (index: number, color: string, text: string) => {
     )
 }
 
-/** 
- * add a new player,  
- * broadcasts `UpdatePlayers` (will ResetGame) 
- * @param(string) id - the id of the new player
- */
+/** add a new player */
 export const addPlayer = (id: string, playerName: string) => {
     if (LogLevel >= debug) console.log('add player ', id + '  ' + playerName)
     

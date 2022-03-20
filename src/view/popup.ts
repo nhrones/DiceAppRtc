@@ -1,7 +1,7 @@
 import {} from '../framework/model/events.js'
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
-import  * as socket  from '../framework/comms/signaling.js'
+import { onEvent } from '../framework/comms/signaling.js'
 import { when, Event, Fire } from '../framework/model/events.js'
 
 let left = 1
@@ -50,13 +50,13 @@ export default class Popup implements View {
         ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         // Our model broadcasts this ShowPopup event at the end of a game
-        when(Event.ShowPopup, (data: { message: string }) => {
-            this.show(data.message)
+        when(Event.ShowPopup, (message: string) => {
+            this.show(message)
         })
 
-        // Other web-players may broadcast a ShowPopup event at the end of a game
-        socket.onEvent('ShowPopup', (data: { message: string }) => {
-            this.show(data.message)
+        // Other web-peers may broadcast a ShowPopup event at the end of a game
+        onEvent('ShowPopup', (message: string ) => {
+            this.show(message)
         })
 
         when(Event.HidePopup, () => {

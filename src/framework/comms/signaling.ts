@@ -1,5 +1,3 @@
- 
-import { Event, Fire } from '../model/events.js'
 import * as webRTC from './webRTC.js'
 import { LogLevel, debug, error, SignalServerURL } from '../../constants.js'
 
@@ -54,11 +52,10 @@ export const initialize = (nam: string, id: string) => {
         webRTC.initialize()
     }
 
+    // this is most always peer-count exceeded!
     sse.onerror = (err) => {
         if (LogLevel >= debug) console.error('sse.error!', err);
-        //TODO Decouple Events - move this from Event to internal dispatch
-        // then subscribe using 'onEvent' in app and relay to Events
-        Fire(Event.ShowPopup, { message: `Game Full! Please close tab!` })
+        dispatch('ShowPopup', `Seats Full! Please close tab!`)
     }
 
     sse.onmessage = (msg: MessageEvent) => {
@@ -106,7 +103,7 @@ export const disconnect = () => {
 /** Notify any listening peer ... we're registering as a new peer */
 export const registerPeer = (id: string, name: string) => {
     // At this point, we don't know our peer.
-    // (we'll expect a 'PlayerUpdate' response message)
+    // (we'll expect a 'PeerUpdate' response message)
     const regObj = {
         from: id,
         event: 'RegisterPeer',
@@ -120,7 +117,7 @@ export const registerPeer = (id: string, name: string) => {
 }
 
 /** Dispatch a message event to all registered listeners with optional data      	  
- * @example dispatch('ResetTurn', {currentPlayerIndex: 1} )    
+ * @example dispatch('ResetTurn', {currentPeerIndex: 1} )    
  * @param event (string) - the event of interest
  * @param data (string | string[] | object) - optional data to report to subscribers
  */
