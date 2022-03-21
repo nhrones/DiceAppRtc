@@ -4,6 +4,9 @@ import { LogLevel, debug, error, SignalServerURL } from '../../constants.js'
 export let thisID = ''
 export let thisName = ''
 
+//TODO add peers to all `comms` callee/caller aka-peer1/peer2
+//TODO then copy comms to chatApp2
+
 const host = window.location.hostname
 const serviceURL = (host === '127.0.0.1' || host === 'localhost')
     ? 'http://localhost:8000'

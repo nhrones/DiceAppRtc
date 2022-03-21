@@ -1,9 +1,11 @@
 import { dispatch, onEvent, signal, SignalingMessage } from './signaling.js'
-import { LogLevel, debug } from '../../constants.js'
+import { LogLevel, info, debug } from '../../constants.js'
 
 ///////////////////////////////////////////////////////////////////
 // The RTCDataChannel API enables peer-to-peer exchange of data  //
 ///////////////////////////////////////////////////////////////////
+
+//TODO add peers to all `comms` callee/caller aka-peer1/peer2
 
 export let peerConnection: RTCPeerConnection;
 export let dataChannel: RTCDataChannel;
@@ -15,7 +17,7 @@ export const initialize = () => {
     // handle a Session-Description-Offer 
     onEvent('RtcOffer', async (offer: RTCSessionDescriptionInit) => {
         if (peerConnection) {
-            if (LogLevel >= debug) console.error('existing peerconnection');
+            if (LogLevel >= info) console.error('existing peerconnection');
             return;
         }
         createPeerConnection(false);
@@ -157,15 +159,7 @@ function checkDataChannelState() {
     } else if (dataChannel.readyState === ReadyState.closed) {
         if (RTCopen === true) {
             RTCopen = false
-            
-            //TODO decouple from Events
-            // currently handled in ...
-            // players::when(Event.PeerDisconnected, ()=>{
-            //     removePlayer([...players][1].id)
-            // })
             dispatch('PeerDisconnected', 'Peer has disconnected!') 
-            
-            //Fire(Event.PeerDisconnected, '')
             reset('Peer has disconnected!')
         }
     }
