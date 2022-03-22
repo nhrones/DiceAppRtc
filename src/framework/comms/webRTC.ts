@@ -1,11 +1,23 @@
-import { dispatch, onEvent, signal, SignalingMessage } from './signaling.js'
-import { LogLevel, info, debug } from '../../constants.js'
+
+import { 
+    Peer, 
+    callee, 
+    caller, 
+    setCaller
+}  from './peers.js'
+
+import { 
+    dispatch, 
+    onEvent, 
+    signal, 
+    SignalingMessage  
+} from './signaling.js'
+
+const DEBUG = true
 
 ///////////////////////////////////////////////////////////////////
 // The RTCDataChannel API enables peer-to-peer exchange of data  //
 ///////////////////////////////////////////////////////////////////
-
-//TODO add peers to all `comms` callee/caller aka-peer1/peer2
 
 export let peerConnection: RTCPeerConnection;
 export let dataChannel: RTCDataChannel;
@@ -15,13 +27,15 @@ export let RTCopen = false
 export const initialize = () => {
 
     // handle a Session-Description-Offer 
-    onEvent('RtcOffer', async (offer: RTCSessionDescriptionInit) => {
+    onEvent('RtcOffer', async (data: {from: Peer, data: RTCSessionDescriptionInit}) => {
+        // a callee sent us an offer, lets set the caller
+        setCaller( data.from)
         if (peerConnection) {
-            if (LogLevel >= info) console.error('existing peerconnection');
+            if (DEBUG) console.error('existing peerconnection');
             return;
         }
         createPeerConnection(false);
-        await peerConnection.setRemoteDescription(offer);
+        await peerConnection.setRemoteDescription(data.data);
         const answer = await peerConnection.createAnswer();
         signal({event: 'RtcAnswer', data:{ type: 'answer', sdp: answer.sdp }});
 
@@ -33,7 +47,7 @@ export const initialize = () => {
     // handle a Session-Description-Answer 
     onEvent('RtcAnswer', async (answer: RTCSessionDescriptionInit) => {
         if (!peerConnection) {
-            if (LogLevel >= debug) console.error('no peerconnection');
+            if (DEBUG) console.error('no peerconnection');
             return;
         }
         await peerConnection.setRemoteDescription(answer);
@@ -42,9 +56,10 @@ export const initialize = () => {
     // handle ICE-Candidate
     onEvent('candidate', async (candidate: RTCIceCandidateInit) => {
         if (!peerConnection) {
-            if (LogLevel >= debug) console.error('no peerconnection');
+            if (DEBUG) console.error('no peerconnection');
             return;
         }
+        console.log('handling candidate!')
         if (!candidate.candidate) {
             await peerConnection.addIceCandidate(null);
         } else {
@@ -52,7 +67,7 @@ export const initialize = () => {
         }
     })
 
-    onEvent('Bye', () => {
+    onEvent('close', () => {
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null
@@ -60,25 +75,28 @@ export const initialize = () => {
     })
 
     // A peer is offering to connect
-    onEvent('invitation', (_data: any) => {
+    onEvent('invitation', (data: any) => {
         // I'll initiate an RTC-connection unless I'm engaged already.
         if (peerConnection) {
-            if (LogLevel >= debug) console.log(`Already connected, ignoring this 'invitation'!`);
+            if (DEBUG) console.log(`Already connected, ignoring this 'invitation'!`);
             return;
         }
-        if (LogLevel >= debug) console.log(`A peer has sent me a 'invitation'!  I'll make a  WebRTC-connection!`);
+        // we got an invitation from a caller-peer
+        setCaller(data)
+        if (DEBUG) console.log(`A peer named ${data.name} has sent me an 'invitation'!  I'll make a  WebRTC-connection!`);
         // start the RTC-connection
         makeConnection();
     })
     
     // Finaly ... tell them your listening/waiting
-    dispatch('UpdateUI', `Waiting for a connection from: ${location.origin}`)
+    dispatch('UpdateUI', `⌛  ${callee.name} is waiting for a connection\n from: ${location.origin}`)
 }
 
 /** Start the peerConnection process by signaling an invitation */
 export const start = () => {
     // invite any peer, then wait for an `accept` message
-    signal({event: 'invitation', data: {}});
+    console.info('inviting from start - callee:', callee)
+    signal({event: 'invitation', data: callee});
 } 
 
 /** Resets the peerConnection and dataChannel, and calls 'start()' */
@@ -94,7 +112,7 @@ function reset (msg: string) {
  *   true when called by makeConnection() - we are sending an offer    
  *   false when called from signaler.when('RtcOffer') - someone else sent us an offer */
 function createPeerConnection(isOfferor: boolean) {
-    if (LogLevel >= debug) console.log('Starting WebRTC as', isOfferor ? 'Offeror' : 'Offeree');
+    if (DEBUG) console.log('Starting WebRTC as', isOfferor ? 'Offeror' : 'Offeree');
     peerConnection = new RTCPeerConnection({
         iceServers: [{urls: ["stun:stun1.l.google.com:19302","stun:stun2.l.google.com:19302"]}]
     });
@@ -118,7 +136,7 @@ function createPeerConnection(isOfferor: boolean) {
 
     // creating data channel 
     if (isOfferor) {
-        if (LogLevel >= debug) console.log('Offeror -> creating dataChannel!');
+        if (DEBUG) console.log('Offeror -> creating dataChannel!');
         // createDataChannel is a factory method on the RTCPeerConnection object
         dataChannel = peerConnection.createDataChannel('chat');
         setupDataChannel();
@@ -126,7 +144,7 @@ function createPeerConnection(isOfferor: boolean) {
         // If this peer is not the `offeror`, wait for 
         // the offeror to pass us a DataChannel
         peerConnection.ondatachannel = (event) => {
-            if (LogLevel >= debug) console.log('peerConnection.ondatachannel -> creating dataChannel!');
+            if (DEBUG) console.log('peerConnection.ondatachannel -> creating dataChannel!');
             dataChannel = event.channel;
             setupDataChannel();
         }
@@ -135,7 +153,7 @@ function createPeerConnection(isOfferor: boolean) {
 
 /** Hook up data channel event handlers */ 
 function setupDataChannel() {
-    checkDataChannelState();
+    //checkDataChannelState();
     dataChannel.onopen = checkDataChannelState;
     dataChannel.onclose = checkDataChannelState;
     
@@ -144,7 +162,7 @@ function setupDataChannel() {
     dataChannel.onmessage = (ev: MessageEvent<any>) => { 
         const msg = JSON.parse(ev.data)
         const {event, data} = msg
-        if (LogLevel >= debug) console.info('<<<<  DataChannel got  <<<<  ', event)
+        if (DEBUG) console.info('<<<<  DataChannel got  <<<<  ', event)
         dispatch(event, data)
     }
 }
@@ -154,13 +172,14 @@ function checkDataChannelState() {
     if (dataChannel.readyState === ReadyState.open) {
         if (RTCopen === false) {
             RTCopen = true
-            dispatch('UpdateUI',`Peer1 is now connected to Peer2`);
+            console.info('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&caller:',caller)
+            dispatch('UpdateUI', `${callee.name} is now connected to ${caller.name}`);
         }
     } else if (dataChannel.readyState === ReadyState.closed) {
         if (RTCopen === true) {
             RTCopen = false
-            dispatch('PeerDisconnected', 'Peer has disconnected!') 
-            reset('Peer has disconnected!')
+            dispatch('PeerDisconnected', `${caller.name} has disconnected!`) 
+            reset(`${caller.name} has disconnected!`)
         }
     }
 }
@@ -168,7 +187,7 @@ function checkDataChannelState() {
 export async function makeConnection() {
     createPeerConnection(true);
     const offer = await peerConnection.createOffer();
-    signal({event:'RtcOffer', data: { type: 'offer', sdp: offer.sdp }});
+    signal({event:'RtcOffer', data: {from: callee, data:{ type: 'offer', sdp: offer.sdp }}});
     // Note that RTCPeerConnection won't start gathering 
     // candidates until setLocalDescription() is called.
     await peerConnection.setLocalDescription(offer);
@@ -181,10 +200,10 @@ export async function makeConnection() {
  export const sendSignal = (msg: SignalingMessage) => {
     if (dataChannel && dataChannel.readyState === 'open') {
         const jsonMsg = JSON.stringify(msg)
-        if (LogLevel >= debug) console.info('>>>>  DataChannel  >>>> :', jsonMsg)
+        if (DEBUG) console.info('>>>>  DataChannel  >>>> :', jsonMsg)
         dataChannel.send(jsonMsg)
     } else {
-        if (LogLevel >= debug) console.log('No place to send the message:', msg.event)
+        if (DEBUG) console.log('No place to send the message:', msg.event)
     }
 }
 

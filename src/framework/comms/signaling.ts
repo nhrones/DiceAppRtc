@@ -1,20 +1,25 @@
+
+import {
+    initPeers, 
+    Emoji, 
+    callee, 
+    registerPeer
+} from './peers.js'
+
 import * as webRTC from './webRTC.js'
-import { LogLevel, debug, error, SignalServerURL } from '../../constants.js'
 
-export let thisID = ''
-export let thisName = ''
+const DEBUG = true
 
-//TODO add peers to all `comms` callee/caller aka-peer1/peer2
-//TODO then copy comms to chatApp2
-
+ // set the correct url for our signal-service
 const host = window.location.hostname
-const serviceURL = (host === '127.0.0.1' || host === 'localhost')
+const SignalServerURL = 'https://rtc-signal-server.deno.dev'
+export const serviceURL = (host === '127.0.0.1' || host === 'localhost')
     ? 'http://localhost:8000'
     : SignalServerURL
-
 console.log('serviceURL', serviceURL)
 
-/**  Each Map-entry holds an array of callback functions mapped to an event ID */
+
+/**  Each Map-entry holds an array of callback functions mapped to an Event name */
 const subscriptions = new Map<number | string, Function[]>()
 
 /** sse - Server Sent Events listener    
@@ -26,21 +31,23 @@ export let sse: EventSource
 
 
 /** Initializes this signal service event listeners */
-export const initialize = (nam: string, id: string) => {
+export const initialize = (name: string, id: string, emoji = Emoji[0]) => {
+    
     // if we've already initialized just return
     if (sse) { return }
-    thisName = nam
+    
+    // setup peers
+    initPeers(id, name)
+    
     // close the sse when the window closes
     window.addEventListener('beforeunload', () => {
         if (sse.readyState === SSE.OPEN) {
-            const sigMsg = JSON.stringify(
-                {
-                    from: thisID,
+            const sigMsg = JSON.stringify({
+                    from: callee.id,
                     event: 'close',
-                    data: thisID + ' window was closed!',
+                    data: callee.id + ' window was closed!',
                     id: 0
-                }
-            )
+                })
             fetch(serviceURL, {
                 method: "POST",
                 body: sigMsg
@@ -51,34 +58,33 @@ export const initialize = (nam: string, id: string) => {
     sse = new EventSource(serviceURL + '/listen/' + id)
 
     sse.onopen = () => {
-        if (LogLevel >= debug) console.log('Sse.onOpen! >>>  webRTC.start()');
+        if (DEBUG) console.log('Sse.onOpen! >>>  webRTC.start()');
         webRTC.initialize()
     }
 
     // this is most always peer-count exceeded!
     sse.onerror = (err) => {
-        if (LogLevel >= debug) console.error('sse.error!', err);
+        if (DEBUG) console.error('sse.error!', err);
         dispatch('ShowPopup', `Seats Full! Please close tab!`)
     }
 
     sse.onmessage = (msg: MessageEvent) => {
-        if (LogLevel >= debug) console.log('<<<<  signaler got  <<<<  ', msg.data)
+        if (DEBUG) console.log('<<<<  signaler got  <<<<  ', msg.data)
         const msgObject = JSON.parse(msg.data)
-        if (LogLevel >= debug) console.info('      parsed data = ', msgObject)
+        if (DEBUG) console.info('      parsed data = ', msgObject)
         const event = msgObject.event
-        if (LogLevel >= debug) console.info('               event: ', event)
+        if (DEBUG) console.info('               event: ', event)
         dispatch(event, msgObject.data)
     }
 
-    // dedicated listener for the SetID event
-    //Once we connect with the server, it will send our new peer 'ID'
+    // SetID-Event listener. 
+    // On connect, the signal-service will send our new ID.
     sse.addEventListener('SetID', (ev: MessageEvent) => {
         const msgObject = JSON.parse(ev.data)
         const { data } = msgObject
-        thisID = data.id
-        console.log('signaler::on.SetID - data type = ' + (typeof data) + ' id ' + thisID)        
-        dispatch('SetID', { id: thisID, name: thisName })
-        registerPeer(thisID, thisName) // tell your peer     
+        registerPeer( data.id, callee.name )
+        // dispatch this event to any subscribers     
+        dispatch('SetID', { id: data.id, name: callee.name })
         webRTC.start()
     })
 }
@@ -101,22 +107,6 @@ export const disconnect = () => {
     // closes the connection from the client side
     sse.close()
     getState('Disconnecting streamedEvents!')
-}
-
-/** Notify any listening peer ... we're registering as a new peer */
-export const registerPeer = (id: string, name: string) => {
-    // At this point, we don't know our peer.
-    // (we'll expect a 'PeerUpdate' response message)
-    const regObj = {
-        from: id,
-        event: 'RegisterPeer',
-        data: { id: id, name: name }
-    }
-    const msg = JSON.stringify(regObj)
-    fetch(serviceURL, {
-        method: "POST",
-        body: msg
-    })
 }
 
 /** Dispatch a message event to all registered listeners with optional data      	  
@@ -149,23 +139,17 @@ export const onEvent = (event: number | string, listener: Function) => {
  *	@param msg (SignalingMessage) - contains both `event` and `data` */
 export const signal = (msg: SignalingMessage) => {
     if (sse.readyState === SSE.OPEN) {
-        const sigMsg = JSON.stringify({ from: thisID, event: msg.event, data: msg.data })
-        if (LogLevel >= debug) console.log('>>>>  sig-server  >>>> :', sigMsg)
+        const sigMsg = JSON.stringify({ from: callee.id, event: msg.event, data: msg.data })
+        if (DEBUG) console.log('>>>>  sig-server  >>>> :', sigMsg)
         fetch(serviceURL, {
             method: "POST",
             body: sigMsg
         })
     } else {
-        if (LogLevel >= error) {
+        if (DEBUG) {
             console.error('No place to send the message:', msg.event)
         }
     }
-}
-
-/** SignalingMessage type */
-export type SignalingMessage = {
-    event: string,
-    data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string[] | string,
 }
 
 /** SSE ReadyState */
@@ -173,4 +157,10 @@ export const SSE = {
     CONNECTING: 0,
     OPEN: 1,
     CLOSED: 2
+}
+
+/** SignalingMessage type */
+export type SignalingMessage = {
+    event: string,
+    data: RTCSessionDescriptionInit | RTCIceCandidateInit | object | string[] | string,
 }
