@@ -40,7 +40,9 @@ export const initialize = (name: string, id: string, emoji = Emoji[0]) => {
     initPeers(id, name)
     
     // close the sse when the window closes
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', (ev: BeforeUnloadEvent) => {
+        ev.preventDefault();
+        ev.returnValue = 'Are you sure you want to Quit?';
         if (sse.readyState === SSE.OPEN) {
             const sigMsg = JSON.stringify({
                     from: callee.id,
