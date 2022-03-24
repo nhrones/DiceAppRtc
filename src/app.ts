@@ -2,7 +2,6 @@ import { Event, Fire } from './framework/model/events.js'
 import { DiceGame } from './model/diceGame.js';
 import { Container, container } from './view/container.js'
 import * as signaler from './framework/comms/signaling.js';
-import { LogLevel, debug, error} from './constants.js'
 
 
 let name = prompt("What's your name?", "Bill") || 'Nick';
@@ -10,7 +9,7 @@ let t = Date.now().toString()
 export let myID = name + '-' + t.substring(t.length-3)
 signaler.initialize(name, myID)
 
-// sorry game full from us!
+// show any popup messages
 signaler.onEvent('ShowPopup', (msg: string) => {
     console.info('************** ShowPopup-msg', msg)
     Fire(Event.ShowPopup, msg )

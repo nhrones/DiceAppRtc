@@ -1,7 +1,7 @@
 import { onEvent, signal } from '../framework/comms/signaling.js'
 import { Event, Fire, when } from '../framework/model/events.js'
 import { Player } from '../types.js'
-import { LogLevel, debug, error, info } from '../constants.js'
+import { DEBUG } from '../constants.js'
 import { DiceGame } from './diceGame.js'
 
 const MAXPLAYERS = 2
@@ -52,7 +52,7 @@ export const init = (thisgame: DiceGame, color: string) => {
     onEvent('RegisterPeer', (player: {id: string, name: string}) => {
         console.log('playerid: ', player.id)
         const {id, name} = player
-        if (LogLevel >= debug) console.log(`Players.RegisterPeer ${id}  ${name}`)
+        if (DEBUG) console.log(`Players.RegisterPeer ${id}  ${name}`)
         addPlayer(id, name);
         setCurrentPlayer([...players][0]);
         game.resetGame();
@@ -139,7 +139,7 @@ const updatePlayer = (index: number, color: string, text: string) => {
 
 /** add a new player */
 export const addPlayer = (id: string, playerName: string) => {
-    if (LogLevel >= debug) console.log('add player ', id + '  ' + playerName)
+    if (DEBUG) console.log('add player ', id + '  ' + playerName)
     
     // handle any missing name with a default
     if (playerName === 'Player') {
@@ -155,7 +155,7 @@ export const addPlayer = (id: string, playerName: string) => {
     } 
     // go ahead and add the new player
     else {
-        if (LogLevel >= debug) console.log(`Players adding, id:${id} name: ${playerName}`)
+        if (DEBUG) console.log(`Players adding, id:${id} name: ${playerName}`)
         players.add(
             {
                 id: id,
@@ -167,7 +167,7 @@ export const addPlayer = (id: string, playerName: string) => {
             }
         )
     }
-    if (LogLevel >= debug) console.info(' added player', Array.from(players.values()))
+    if (DEBUG) console.info(' added player', Array.from(players.values()))
 
 }
 
@@ -179,7 +179,7 @@ export const addPlayer = (id: string, playerName: string) => {
 export const removePlayer = (id: string) => {
     const p = getById(id)
     if(p === null) return
-    if (LogLevel >= debug) console.info(' removing player', p)
+    if (DEBUG) console.info(' removing player', p)
     players.delete(p)
     refreshPlayerColors();
     setThisPlayer([...players][0])
@@ -223,7 +223,7 @@ const playerColors = ["Brown", "Green", "RoyalBlue", "Red"]
 
 
 export const setThisPlayer = (player: Player) => {
-    if (LogLevel >= debug) console.log(`Step-4 - Players.setThisPlayer: ${player.playerName}`)
+    if (DEBUG) console.log(`Step-4 - Players.setThisPlayer: ${player.playerName}`)
     const favicon = document.getElementById("favicon") as HTMLLinkElement
     thisPlayer = player
     document.title = thisPlayer.playerName
@@ -249,6 +249,6 @@ export let currentPlayer: Player = {
 }
 
 export const setCurrentPlayer = (player: Player) => {
-    if (LogLevel >= debug) console.log(`Step-5 - Players.settingCurrentPlayer: ${player.playerName}`)
+    if (DEBUG) console.log(`Step-5 - Players.settingCurrentPlayer: ${player.playerName}`)
     currentPlayer = player
 }
