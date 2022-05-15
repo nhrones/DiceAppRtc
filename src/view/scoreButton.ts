@@ -2,12 +2,7 @@
 import { Geometry, View } from '../types.js'
 import { container, ctx } from './container.js'
 import Label from './label.js'
-
-import {  
-    when, 
-    Event,  
-    Fire 
-} from '../framework/model/events.js'
+import { Event, when, Fire } from '../framework/model/events.js'
 
 /** 
  * A virtual ScoreButton view class 
@@ -30,7 +25,7 @@ export default class ScoreButton implements View {
     scoreText: string = ''
     available: boolean = false
     tooltip: string = ""
-    
+
     upperText: string = ""
     lowerText: string = ""
     upperName: Label | null = null
@@ -79,7 +74,8 @@ export default class ScoreButton implements View {
                 this.available = data.available
                 this.scoreText = data.valueString
                 this.renderScore(data.valueString, data.available)
-            })
+            }
+        )
     }
 
     /** 
@@ -90,7 +86,7 @@ export default class ScoreButton implements View {
     }
 
     update() {
-        Fire(Event.UpdateTooltip + this.index, {hovered: this.hovered})
+        Fire(Event.UpdateTooltip + this.index, { hovered: this.hovered })
         this.render()
         this.renderScore(this.scoreText, this.available)
     }
